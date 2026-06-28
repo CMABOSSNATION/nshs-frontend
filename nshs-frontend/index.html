@@ -6,7 +6,8 @@
   <meta name="description" content="Nebbi School of Health Sciences — Training compassionate health professionals for Uganda and beyond. Apply for diploma and certificate programmes today."/>
   <title>Nebbi School of Health Sciences | NSHS</title>
   <link rel="stylesheet" href="css/style.css"/>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%230d5c32'/><text y='.9em' font-size='65' x='50%' text-anchor='middle' fill='white' font-family='Georgia,serif' font-weight='bold'>N</text></svg>"/>
+  <!-- Favicon uses logo1.png if available, fallback to SVG -->
+  <link rel="icon" href="images/logo.png" onerror="this.href='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' rx=\'50\' fill=\'%230d5c32\'/><text y=\'.9em\' font-size=\'65\' x=\'50%\' text-anchor=\'middle\' fill=\'white\' font-family=\'Georgia,serif\' font-weight=\'bold\'>N</text></svg>'"/>
 </head>
 <body>
 
@@ -29,7 +30,10 @@
   <div class="nav-inner">
     <a href="index.html" class="nav-brand">
       <div class="nav-logo-wrap">
-        <div class="nav-logo">N</div>
+        <!-- logo1.png = main school logo. Falls back to letter N if missing -->
+        <img src="images/logo.png" alt="NSHS Logo" class="nav-logo-img"
+             onerror="this.style.display='none';document.getElementById('navLogoFallback').style.display='flex'"/>
+        <div class="nav-logo" id="navLogoFallback" style="display:none">N</div>
         <div class="nav-logo-ring"></div>
       </div>
       <div class="nav-brand-text">
@@ -74,53 +78,73 @@
 <!-- ── HERO ── -->
 <section class="hero">
   <div class="hero-bg"></div>
+  <!-- photo1.jpg = hero background photo (campus or students) -->
+  <div class="hero-photo-bg" id="heroBg"></div>
   <div class="hero-dots"></div>
   <div class="hero-accent"></div>
   <div class="hero-cross"></div>
 
   <div class="hero-body">
     <div class="container">
-      <div class="hero-content">
-        <div class="hero-tag">
-          <span class="hero-tag-dot"></span>
-          2025 / 2026 Intake Now Open
+      <div class="hero-content-wrap">
+
+        <!-- Left: text content -->
+        <div class="hero-content">
+          <div class="hero-tag">
+            <span class="hero-tag-dot"></span>
+            2025 / 2026 Intake Now Open
+          </div>
+
+          <h1>
+            Training<br>
+            <span class="highlight">Health Heroes</span><br>
+            for Uganda
+          </h1>
+
+          <p class="hero-desc">
+            Nebbi School of Health Sciences offers world-class diploma and certificate
+            programmes in nursing, midwifery, clinical medicine and more —
+            shaping Uganda's next generation of skilled health professionals.
+          </p>
+
+          <div class="hero-actions">
+            <a href="pages/admissions.html" class="btn btn-gold btn-lg">Apply Now →</a>
+            <a href="pages/programs.html" class="btn btn-white btn-lg">View Programmes</a>
+          </div>
+
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <div class="hero-stat-num" data-count="500">0</div>
+              <div class="hero-stat-label">Active<br>Students</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-num" data-count="12">0</div>
+              <div class="hero-stat-label">Programmes<br>Offered</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-num" data-suffix="%">95</div>
+              <div class="hero-stat-label">Employment<br>Rate</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-num" data-count="15">0</div>
+              <div class="hero-stat-label">Years of<br>Excellence</div>
+            </div>
+          </div>
         </div>
 
-        <h1>
-          Training<br>
-          <span class="highlight">Health Heroes</span><br>
-          for Uganda
-        </h1>
-
-        <p class="hero-desc">
-          Nebbi School of Health Sciences offers world-class diploma and certificate
-          programmes in nursing, midwifery, clinical medicine and more —
-          shaping Uganda's next generation of skilled health professionals.
-        </p>
-
-        <div class="hero-actions">
-          <a href="pages/admissions.html" class="btn btn-gold btn-lg">Apply Now →</a>
-          <a href="pages/programs.html" class="btn btn-white btn-lg">View Programmes</a>
-        </div>
-
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <div class="hero-stat-num" data-count="500">0</div>
-            <div class="hero-stat-label">Active<br>Students</div>
-          </div>
-          <div class="hero-stat">
-            <div class="hero-stat-num" data-count="12">0</div>
-            <div class="hero-stat-label">Programmes<br>Offered</div>
-          </div>
-          <div class="hero-stat">
-            <div class="hero-stat-num" data-suffix="%">95</div>
-            <div class="hero-stat-label">Employment<br>Rate</div>
-          </div>
-          <div class="hero-stat">
-            <div class="hero-stat-num" data-count="15">0</div>
-            <div class="hero-stat-label">Years of<br>Excellence</div>
+        <!-- Right: hero photo (photo2.jpg = students/clinical photo) -->
+        <div class="hero-image-col">
+          <div class="hero-img-frame">
+            <img src="images/hero-students.jpg" alt="NSHS Students"
+                 onerror="this.parentElement.style.display='none'"/>
+            <!-- badge overlay: logo2.png = school badge/seal -->
+            <div class="hero-badge-overlay">
+              <img src="images/badge.png" alt="NSHS Badge"
+                   onerror="this.parentElement.innerHTML='<div class=\'badge-fallback\'>✚<br><span>NSHS</span></div>'"/>
+            </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -148,47 +172,61 @@
 <!-- ── Why NSHS ── -->
 <section class="section why-section">
   <div class="container">
-    <div class="why-header reveal">
-      <span class="eyebrow">Why Choose NSHS</span>
-      <h2 class="section-title">Built for Uganda's<br><span>Health Future</span></h2>
-      <p class="section-sub">We combine rigorous academics with hands-on clinical training to produce health professionals ready to serve from day one.</p>
-    </div>
-    <div class="why-grid reveal">
-      <div class="why-card">
-        <span class="why-num">01</span>
-        <div class="why-icon-wrap">🏛️</div>
-        <h3>Government Accredited</h3>
-        <p>Fully recognized by the Ministry of Health Uganda and the Allied Health Professionals Council — your qualification is valid nationwide.</p>
+    <div class="why-layout">
+      <!-- Left: photo3.jpg = clinical training / campus photo -->
+      <div class="why-photo reveal">
+        <img src="images/clinical.jpg" alt="NSHS Clinical Training"
+             onerror="this.parentElement.classList.add('why-photo-fallback')"/>
+        <div class="why-photo-badge">
+          <img src="images/badge.png" alt="NSHS"
+               onerror="this.parentElement.innerHTML='<span>✚</span><strong>NSHS</strong>'"/>
+        </div>
       </div>
-      <div class="why-card">
-        <span class="why-num">02</span>
-        <div class="why-icon-wrap">🏥</div>
-        <h3>Real Clinical Training</h3>
-        <p>Hands-on training at Nebbi General Hospital and affiliated health centres. You learn by doing, not just reading.</p>
-      </div>
-      <div class="why-card">
-        <span class="why-num">03</span>
-        <div class="why-icon-wrap">👨‍🏫</div>
-        <h3>Expert Faculty</h3>
-        <p>Our lecturers are practising health professionals with deep field experience — they teach what actually works.</p>
-      </div>
-      <div class="why-card">
-        <span class="why-num">04</span>
-        <div class="why-icon-wrap">💰</div>
-        <h3>Affordable Fees</h3>
-        <p>Competitive tuition with flexible payment via MTN & Airtel Mobile Money. Education should never be out of reach.</p>
-      </div>
-      <div class="why-card">
-        <span class="why-num">05</span>
-        <div class="why-icon-wrap">🏆</div>
-        <h3>High Pass Rates</h3>
-        <p>Consistently top board examination results across Uganda. Our students are prepared to excel from the very first paper.</p>
-      </div>
-      <div class="why-card">
-        <span class="why-num">06</span>
-        <div class="why-icon-wrap">🌍</div>
-        <h3>Employment Network</h3>
-        <p>Strong links with hospitals, NGOs and health facilities across Uganda and East Africa — your career starts here.</p>
+      <!-- Right: content -->
+      <div class="why-right">
+        <div class="why-header reveal">
+          <span class="eyebrow">Why Choose NSHS</span>
+          <h2 class="section-title">Built for Uganda's<br><span>Health Future</span></h2>
+          <p class="section-sub" style="margin:0 0 40px">We combine rigorous academics with hands-on clinical training to produce health professionals ready to serve from day one.</p>
+        </div>
+        <div class="why-grid reveal">
+          <div class="why-card">
+            <span class="why-num">01</span>
+            <div class="why-icon-wrap">🏛️</div>
+            <h3>Government Accredited</h3>
+            <p>Fully recognized by the Ministry of Health Uganda and the Allied Health Professionals Council.</p>
+          </div>
+          <div class="why-card">
+            <span class="why-num">02</span>
+            <div class="why-icon-wrap">🏥</div>
+            <h3>Real Clinical Training</h3>
+            <p>Hands-on training at Nebbi General Hospital. You learn by doing, not just reading.</p>
+          </div>
+          <div class="why-card">
+            <span class="why-num">03</span>
+            <div class="why-icon-wrap">👨‍🏫</div>
+            <h3>Expert Faculty</h3>
+            <p>Our lecturers are practising health professionals with deep field experience.</p>
+          </div>
+          <div class="why-card">
+            <span class="why-num">04</span>
+            <div class="why-icon-wrap">💰</div>
+            <h3>Affordable Fees</h3>
+            <p>Flexible payment via MTN & Airtel Mobile Money. Education should never be out of reach.</p>
+          </div>
+          <div class="why-card">
+            <span class="why-num">05</span>
+            <div class="why-icon-wrap">🏆</div>
+            <h3>High Pass Rates</h3>
+            <p>Consistently top board examination results. Our students excel from the very first paper.</p>
+          </div>
+          <div class="why-card">
+            <span class="why-num">06</span>
+            <div class="why-icon-wrap">🌍</div>
+            <h3>Employment Network</h3>
+            <p>Strong links with hospitals and NGOs across Uganda and East Africa.</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -200,7 +238,7 @@
     <div class="programs-header reveal">
       <span class="eyebrow">Academic Programmes</span>
       <h2 class="section-title">Our <span>Programmes</span></h2>
-      <p class="section-sub">Choose from our range of accredited health science programmes designed to meet Uganda's growing demand for skilled professionals.</p>
+      <p class="section-sub">Accredited health science programmes designed to meet Uganda's growing demand for skilled professionals.</p>
     </div>
     <div class="programs-grid" id="programsGrid">
       <div class="loader"><div class="spinner"></div> Loading programmes...</div>
@@ -216,9 +254,7 @@
   <div class="container">
     <div class="cta-box reveal">
       <div>
-        <div class="cta-tag">
-          <span>●</span> 2025/2026 Intake Open
-        </div>
+        <div class="cta-tag"><span>●</span> 2025/2026 Intake Open</div>
         <h2>Ready to Start Your<br>Health Career?</h2>
         <p>Applications are open now. Join hundreds of students already training to become Uganda's next generation of health professionals. Limited spaces available.</p>
       </div>
@@ -240,6 +276,7 @@
       </div>
       <a href="pages/news.html" class="btn btn-outline-green">View All News →</a>
     </div>
+    <!-- Static news with photos photo4/5/6 as fallback -->
     <div class="news-grid" id="newsGrid">
       <div class="loader"><div class="spinner"></div> Loading news...</div>
     </div>
@@ -250,9 +287,7 @@
 <section class="verify-section">
   <div class="container">
     <div class="verify-inner reveal">
-      <span class="eyebrow" style="color:var(--gold);justify-content:center">
-        Certificate Verification
-      </span>
+      <span class="eyebrow" style="color:var(--gold);justify-content:center">Certificate Verification</span>
       <h2 class="section-title" style="color:white">Verify a Graduate<br>Certificate</h2>
       <p class="section-sub">Employers can instantly verify the authenticity of any NSHS certificate online.</p>
       <div class="verify-card">
@@ -274,37 +309,23 @@
         <span class="eyebrow">Get In Touch</span>
         <h3 class="contact-info-title">We're Here<br>to Help You</h3>
         <p class="contact-desc">Have questions about admissions, programmes or fees? Our team is ready to guide you every step of the way.</p>
-
         <div class="contact-item">
           <div class="contact-icon-box">📍</div>
-          <div>
-            <h4>Location</h4>
-            <p>Nebbi Town, Nebbi District<br>West Nile, Uganda</p>
-          </div>
+          <div><h4>Location</h4><p>Nebbi Town, Nebbi District<br>West Nile, Uganda</p></div>
         </div>
         <div class="contact-item">
           <div class="contact-icon-box">📞</div>
-          <div>
-            <h4>Phone / WhatsApp</h4>
-            <p>+256 772 000 000<br>+256 700 000 000</p>
-          </div>
+          <div><h4>Phone / WhatsApp</h4><p>+256 772 000 000<br>+256 700 000 000</p></div>
         </div>
         <div class="contact-item">
           <div class="contact-icon-box">📧</div>
-          <div>
-            <h4>Email</h4>
-            <p>admissions@nshs.ac.ug<br>info@nshs.ac.ug</p>
-          </div>
+          <div><h4>Email</h4><p>admissions@nshs.ac.ug<br>info@nshs.ac.ug</p></div>
         </div>
         <div class="contact-item">
           <div class="contact-icon-box">🕐</div>
-          <div>
-            <h4>Office Hours</h4>
-            <p>Mon–Fri: 8:00 AM – 5:00 PM<br>Saturday: 9:00 AM – 1:00 PM</p>
-          </div>
+          <div><h4>Office Hours</h4><p>Mon–Fri: 8:00 AM – 5:00 PM<br>Saturday: 9:00 AM – 1:00 PM</p></div>
         </div>
       </div>
-
       <div class="contact-form-box reveal reveal-delay-2">
         <h3>Send Us a Message</h3>
         <div class="form-row">
@@ -343,7 +364,10 @@
     <div class="footer-grid">
       <div>
         <div class="footer-brand">
-          <div class="footer-logo">N</div>
+          <!-- logo1.png in footer -->
+          <img src="images/logo.png" alt="NSHS Logo" class="footer-logo-img"
+               onerror="this.style.display='none';document.getElementById('footerLogoFallback').style.display='flex'"/>
+          <div class="footer-logo" id="footerLogoFallback" style="display:none">N</div>
           <div>
             <div class="footer-brand-name">Nebbi School of Health Sciences</div>
             <div class="footer-brand-sub">Nebbi, Uganda</div>
@@ -396,10 +420,25 @@
   <span>Chat with us</span>
 </a>
 
-<!-- Toast -->
 <div class="toast-container" id="toastContainer"></div>
-
 <script src="js/api.js"></script>
 <script src="js/main.js"></script>
+
+<script>
+// Set hero background photo
+const heroBg = document.getElementById('heroBg');
+const heroImg = new Image();
+heroImg.onload = () => {
+  heroBg.style.backgroundImage = `url('images/hero-bg.jpg')`;
+  heroBg.style.opacity = '0.18';
+};
+heroImg.src = 'images/hero-bg.jpg';
+
+// Inject photo into fallback news cards
+function getNewsPhoto(index) {
+  const photos = ['news-1.jpg','news-2.jpg','news-3.jpg'];
+  return `images/${photos[index] || photos[0]}`;
+}
+</script>
 </body>
 </html>
