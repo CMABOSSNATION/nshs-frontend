@@ -883,3 +883,13 @@ ul { list-style: none; }
   .why-photo { display: none; }
   .why-right .why-grid { grid-template-columns: 1fr; }
 }
+
+/* ── Make logo/badge bigger ── */
+.nav-logo-box img {
+  height: 80px !important;
+  width: auto !important;
+}
+.footer-logo-box img {
+  height: 70px !important;
+  width: auto !important;
+}
