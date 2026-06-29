@@ -908,3 +908,16 @@ ul { list-style: none; }
     height: 340px;
   }
 }
+
+/* ── Force hero image visible on all screens ── */
+.hero-img-wrap {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: flex-end !important;
+}
+.hero-img-frame img {
+  height: 400px !important;
+  width: 100% !important;
+  object-fit: cover !important;
+  object-position: top !important;
+}
