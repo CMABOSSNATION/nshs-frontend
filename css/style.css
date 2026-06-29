@@ -137,7 +137,7 @@ ul { list-style: none; }
 }
 
 .nav-brand { display: flex; align-items: center; gap: 14px; }
-.nav-logo-box {
+/* removed */ .nav-logo-box-old {
   width: 54px; height: 54px;
   border-radius: 50%;
   border: 2px solid var(--gold);
@@ -888,4 +888,41 @@ ul { list-style: none; }
   .accred-inner { flex-direction: column; }
   .contact-form-box { padding: 28px 20px; }
   .verify-input-wrap { flex-direction: column; }
+}
+
+/* ── Logo fix: no circle, bigger, visible ── */
+.nav-logo-box {
+  height: 64px;
+  width: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+.nav-logo-box img {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 0;
+  border: none;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+}
+.footer-logo-box {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+  width: auto;
+  height: auto;
+}
+.footer-logo-box img {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 0;
+  border: none;
 }
