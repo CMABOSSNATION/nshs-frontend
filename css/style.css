@@ -893,3 +893,18 @@ ul { list-style: none; }
   height: 70px !important;
   width: auto !important;
 }
+
+/* ── Show hero student photo on mobile ── */
+@media (max-width: 768px) {
+  .hero-img-wrap {
+    display: flex !important;
+    justify-content: center;
+    margin-top: 32px;
+  }
+  .hero-img-frame {
+    max-width: 280px;
+  }
+  .hero-img-frame img {
+    height: 340px;
+  }
+}
