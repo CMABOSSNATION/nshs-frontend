@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Explore diploma and certificate programmes at Nebbi School of Health Sciences — nursing, midwifery, clinical medicine, pharmacy, medical laboratory and public health."/>
+  <title>Programmes — Nebbi School of Health Sciences</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="icon" href="../images/badge.jpg" type="image/png"/>
+  <style>
+    .filter-tabs {
+      display: flex; gap: 0; flex-wrap: wrap;
+      border: 2px solid var(--navy); border-radius: 6px;
+      overflow: hidden; width: fit-content; margin: 0 auto 16px;
+    }
+    .filter-tab {
+      padding: 11px 26px; font-family: var(--font-heading);
+      font-size: 13px; font-weight: 600; letter-spacing: 1.5px;
+      text-transform: uppercase; cursor: pointer; border: none;
+      background: transparent; color: var(--navy); transition: all 0.2s;
+    }
+    .filter-tab.active { background: var(--navy); color: white; }
+    .filter-tab:hover:not(.active) { background: var(--cream-dark); }
+
+    .search-row { max-width: 420px; margin: 0 auto 48px; }
+    .search-row input {
+      width: 100%; padding: 13px 18px; border: 2px solid var(--cream-dark);
+      border-radius: 100px; font-size: 14px; font-family: var(--font-body);
+      outline: none; transition: border-color 0.2s;
+    }
+    .search-row input:focus { border-color: var(--navy); }
+
+    .prog-detail-modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,30,61,0.7);
+      z-index: 1000; display: none; align-items: flex-start;
+      justify-content: center; padding: 20px; overflow-y: auto;
+    }
+    .prog-detail-modal-overlay.open { display: flex; }
+    .prog-detail-modal {
+      background: white; border-radius: 12px; max-width: 600px;
+      width: 100%; margin-top: 40px; overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+    }
+    .prog-detail-header {
+      background: var(--navy); padding: 32px 28px; position: relative;
+    }
+    .prog-detail-close {
+      position: absolute; top: 16px; right: 16px;
+      background: rgba(255,255,255,0.15); border: none; color: white;
+      width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+      font-size: 16px; display: flex; align-items: center; justify-content: center;
+    }
+    .prog-detail-body { padding: 28px; }
+    .prog-detail-row { margin-bottom: 20px; }
+    .prog-detail-row h4 {
+      font-family: var(--font-heading); font-size: 11px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--gold-dark);
+      margin-bottom: 6px;
+    }
+    .prog-detail-row p { font-size: 14px; color: var(--gray-700); line-height: 1.7; }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-brand">
+      <div class="nav-logo-box">
+        <img src="../images/logo.jpg" alt="NSHS Logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+        <span class="nav-logo-fallback" style="display:none">N</span>
+      </div>
+      <div class="nav-brand-text">
+        <div class="nav-brand-name">Nebbi School of Health Sciences</div>
+        <div class="nav-brand-motto">To Serve & Care</div>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="programs.html" class="active">Programmes</a></li>
+      <li><a href="admissions.html">Admissions</a></li>
+      <li><a href="news.html">News</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="verify.html" class="btn btn-outline-white btn-sm">Verify Certificate</a>
+      <a href="portal.html" class="btn btn-gold btn-sm">Student Portal</a>
+    </div>
+    <button class="nav-toggle" id="navToggle">☰</button>
+  </div>
+</nav>
+
+<div class="mobile-nav" id="mobileNav">
+  <button class="mobile-nav-close" id="mobileClose">✕</button>
+  <a href="../index.html">Home</a>
+  <a href="programs.html">Programmes</a>
+  <a href="admissions.html">Admissions</a>
+  <a href="news.html">News & Events</a>
+  <a href="about.html">About Us</a>
+  <a href="contact.html">Contact</a>
+  <div class="mobile-nav-actions">
+    <a href="verify.html" class="btn btn-outline-white">Verify Certificate</a>
+    <a href="portal.html" class="btn btn-gold">Student Portal →</a>
+  </div>
+</div>
+
+<!-- Page Header -->
+<section style="background:var(--navy);padding:140px 0 70px;position:relative;overflow:hidden">
+  <div class="container" style="position:relative;z-index:1;text-align:center">
+    <span class="eyebrow" style="justify-content:center">Academic Programmes</span>
+    <h1 class="section-title white">Our <span style="color:var(--gold)">Programmes</span></h1>
+    <p class="section-sub white">Accredited diploma and certificate programmes designed to meet Uganda's growing demand for skilled health professionals.</p>
+  </div>
+</section>
+
+<!-- Filters -->
+<section style="background:var(--cream);padding:48px 0 90px">
+  <div class="container">
+
+    <div class="filter-tabs">
+      <button class="filter-tab active" data-type="" onclick="filterByType('', this)">All Programmes</button>
+      <button class="filter-tab" data-type="diploma" onclick="filterByType('diploma', this)">Diplomas</button>
+      <button class="filter-tab" data-type="certificate" onclick="filterByType('certificate', this)">Certificates</button>
+    </div>
+
+    <div class="search-row">
+      <input type="text" id="searchInput" placeholder="🔍 Search programmes..." oninput="searchPrograms()"/>
+    </div>
+
+    <div class="programs-grid" id="programsGrid">
+      <div class="loader"><div class="spinner"></div> Loading programmes...</div>
+    </div>
+
+    <!-- Empty state -->
+    <div id="emptyState" style="display:none;text-align:center;padding:60px 20px">
+      <div style="font-size:48px;margin-bottom:16px">🔍</div>
+      <h3 style="font-family:var(--font-heading);font-size:18px;color:var(--gray-500);text-transform:uppercase;letter-spacing:1px">No Programmes Found</h3>
+      <p style="color:var(--gray-400);margin-top:8px">Try a different search term or filter.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="cta-section" style="padding:0 0 90px;background:var(--cream)">
+  <div class="container">
+    <div class="cta-box">
+      <div>
+        <h2>Found Your <span>Programme?</span></h2>
+        <p>Applications for Jan/Jul 2026 intake are open. Apply online today and start your journey to becoming a health professional.</p>
+      </div>
+      <div class="cta-actions">
+        <a href="admissions.html" class="btn btn-gold btn-lg">Apply Now →</a>
+        <a href="tel:0768177177" class="btn btn-outline-white btn-lg">📞 0768 177 177</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Programme Detail Modal -->
+<div class="prog-detail-modal-overlay" id="detailModal">
+  <div class="prog-detail-modal">
+    <div class="prog-detail-header">
+      <button class="prog-detail-close" onclick="closeDetail()">✕</button>
+      <div class="prog-badge" id="detailBadge"></div>
+      <h2 style="font-family:var(--font-heading);font-size:24px;color:white;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:6px" id="detailName"></h2>
+    </div>
+    <div class="prog-detail-body">
+      <div style="display:flex;gap:24px;margin-bottom:24px;flex-wrap:wrap">
+        <div><strong style="font-family:var(--font-heading);font-size:12px;color:var(--gray-400);text-transform:uppercase;letter-spacing:1px">Duration</strong><div id="detailDuration" style="font-size:15px;font-weight:600;color:var(--navy);margin-top:2px"></div></div>
+        <div><strong style="font-family:var(--font-heading);font-size:12px;color:var(--gray-400);text-transform:uppercase;letter-spacing:1px">Field</strong><div id="detailField" style="font-size:15px;font-weight:600;color:var(--navy);margin-top:2px"></div></div>
+        <div><strong style="font-family:var(--font-heading);font-size:12px;color:var(--gray-400);text-transform:uppercase;letter-spacing:1px">Fee/Semester</strong><div id="detailFee" style="font-size:15px;font-weight:600;color:var(--gold-dark);margin-top:2px"></div></div>
+      </div>
+
+      <div class="prog-detail-row" id="descRow" style="display:none">
+        <h4>Overview</h4>
+        <p id="detailDesc"></p>
+      </div>
+      <div class="prog-detail-row" id="reqRow" style="display:none">
+        <h4>Entry Requirements</h4>
+        <p id="detailReq"></p>
+      </div>
+      <div class="prog-detail-row" id="careerRow" style="display:none">
+        <h4>Career Outcomes</h4>
+        <p id="detailCareer"></p>
+      </div>
+      <div class="prog-detail-row" id="intakeRow" style="display:none">
+        <h4>Intake Months</h4>
+        <p id="detailIntake"></p>
+      </div>
+
+      <a href="admissions.html" class="btn btn-gold btn-lg" style="width:100%;justify-content:center;margin-top:8px">Apply For This Programme →</a>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container footer-top">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <div class="footer-logo-box"><img src="../images/logo.jpg" alt="NSHS" onerror="this.style.display='none'"/></div>
+          <div><div class="footer-brand-name">Nebbi School of<br>Health Sciences</div><div class="footer-brand-motto">To Serve & Care</div></div>
+        </div>
+        <p class="footer-desc">Training compassionate and skilled health professionals to serve Uganda and the East African region.</p>
+      </div>
+      <div class="footer-col"><h4>Quick Links</h4>
+        <a href="admissions.html">Apply Online</a>
+        <a href="portal.html">Student Portal</a>
+        <a href="verify.html">Verify Certificate</a>
+      </div>
+      <div class="footer-col"><h4>Contact</h4>
+        <a href="tel:0768177177">0768 177 177</a>
+        <a href="contact.html">Contact Us</a>
+      </div>
+    </div>
+  </div>
+  <div class="container"><div class="footer-bottom"><p>© 2025 Nebbi School of Health Sciences.</p></div></div>
+</footer>
+
+<a href="https://wa.me/256768177177" class="wa-fab" target="_blank"><span class="wa-icon">💬</span><span>0768 177 177</span></a>
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="../js/api.js"></script>
+<script>
+  let allPrograms = [];
+  let currentType = '';
+
+  document.getElementById('navToggle')?.addEventListener('click', () => document.getElementById('mobileNav').classList.add('open'));
+  document.getElementById('mobileClose')?.addEventListener('click', () => document.getElementById('mobileNav').classList.remove('open'));
+
+  async function loadPrograms() {
+    const grid = document.getElementById('programsGrid');
+    try {
+      const data = await API.get(API.PROGRAMS);
+      if (!data.success || !data.data?.length) {
+        allPrograms = fallbackPrograms();
+      } else {
+        allPrograms = data.data;
+      }
+      renderPrograms(allPrograms);
+    } catch {
+      allPrograms = fallbackPrograms();
+      renderPrograms(allPrograms);
+    }
+  }
+
+  function fallbackPrograms() {
+    return [
+      { id:1, name:'Certificate in Nursing', type:'certificate', field:'Nursing', duration:'2 Years', fee_per_semester:650000, description:'Train as a skilled nurse providing essential patient care in hospitals, clinics and communities.', entry_requirements:'UCE with at least 5 credits including English, Mathematics and a Science subject.', career_outcomes:'Enrolled Nurse, Health Centre Nurse, Community Health Worker.', intake_months:'January, July' },
+      { id:2, name:'Certificate in Midwifery', type:'certificate', field:'Midwifery', duration:'2 Years', fee_per_semester:650000, description:'Learn to provide safe maternal and newborn care across Uganda\'s health facilities.', entry_requirements:'UCE with at least 5 credits including English, Biology and Mathematics.', career_outcomes:'Enrolled Midwife, Maternal Health Worker.', intake_months:'January, July' },
+      { id:3, name:'Certificate in Pharmacy', type:'certificate', field:'Pharmacy', duration:'2 Years', fee_per_semester:700000, description:'Gain skills in dispensing, drug management and pharmaceutical care.', entry_requirements:'UCE with at least 5 credits including English, Chemistry and Mathematics.', career_outcomes:'Pharmacy Technician, Dispensary Assistant.', intake_months:'January, July' },
+      { id:4, name:'Certificate in Medical Laboratory', type:'certificate', field:'Laboratory', duration:'2 Years', fee_per_semester:700000, description:'Develop lab skills for diagnostic testing in clinical and public health settings.', entry_requirements:'UCE with credits in English, Biology and Chemistry.', career_outcomes:'Laboratory Assistant, Diagnostic Technician.', intake_months:'January, July' },
+      { id:5, name:'Certificate in Public Health', type:'certificate', field:'Public Health', duration:'2 Years', fee_per_semester:600000, description:'Build foundational knowledge in community health and disease prevention.', entry_requirements:'UCE with at least 5 credits including English.', career_outcomes:'Community Health Worker, Health Educator.', intake_months:'January, July' },
+      { id:6, name:'Diploma in Nursing Extensions', type:'diploma', field:'Nursing', duration:'3 Years', fee_per_semester:850000, description:'Advance your nursing career with a comprehensive diploma-level qualification.', entry_requirements:'UACE with 2 principal passes, or relevant certificate plus experience.', career_outcomes:'Registered Nurse, Ward in-charge, Hospital Nurse.', intake_months:'January, July' },
+      { id:7, name:'Diploma in Midwifery Extensions', type:'diploma', field:'Midwifery', duration:'3 Years', fee_per_semester:800000, description:'Become a fully registered midwife with advanced clinical training.', entry_requirements:'UACE with 2 principal passes, or relevant certificate plus experience.', career_outcomes:'Registered Midwife, Maternity Ward Supervisor.', intake_months:'January, July' },
+      { id:8, name:'Diploma in Clinical Medicine & Community Health', type:'diploma', field:'Medicine', duration:'3 Years', fee_per_semester:1200000, description:'Train as a clinical officer providing primary healthcare and community health services.', entry_requirements:'UACE with 2 principal passes including Biology/Chemistry.', career_outcomes:'Clinical Officer, Health Centre In-charge.', intake_months:'January, July' },
+      { id:9, name:'Diploma in Pharmacy', type:'diploma', field:'Pharmacy', duration:'3 Years', fee_per_semester:1000000, description:'Advanced pharmaceutical training for dispensing and pharmacy management roles.', entry_requirements:'UACE with 2 principal passes including Chemistry.', career_outcomes:'Pharmacy Officer, Pharmacy Manager.', intake_months:'January, July' },
+      { id:10, name:'Diploma in Public Health', type:'diploma', field:'Public Health', duration:'3 Years', fee_per_semester:900000, description:'Lead community health programmes and disease prevention initiatives at a senior level.', entry_requirements:'UACE with 2 principal passes.', career_outcomes:'Public Health Officer, District Health Inspector.', intake_months:'January, July' }
+    ];
+  }
+
+  function renderPrograms(programs) {
+    const grid = document.getElementById('programsGrid');
+    const empty = document.getElementById('emptyState');
+
+    if (!programs.length) {
+      grid.style.display = 'none';
+      empty.style.display = 'block';
+      return;
+    }
+    grid.style.display = 'grid';
+    empty.style.display = 'none';
+
+    grid.innerHTML = programs.map(p => `
+      <div class="program-card" onclick='openDetail(${JSON.stringify(p)})'>
+        <div class="program-card-top">
+          <span class="prog-type-badge ${p.type==='diploma'?'sky':''}">${p.type}</span>
+          <h3>${p.name}</h3>
+        </div>
+        <div class="program-card-body">
+          <div class="prog-meta">
+            <div class="prog-meta-item">⏱️ ${p.duration}</div>
+            <div class="prog-meta-item">📋 ${p.field}</div>
+          </div>
+          <p>${p.description ? p.description.substring(0,100) + '...' : 'A comprehensive health sciences programme preparing skilled professionals.'}</p>
+        </div>
+        <div class="program-card-footer">
+          <div class="prog-fee">From <strong>UGX ${Number(p.fee_per_semester).toLocaleString()}</strong>/sem</div>
+          <a href="admissions.html" class="btn btn-navy btn-sm" onclick="event.stopPropagation()">Apply →</a>
+        </div>
+      </div>`).join('');
+  }
+
+  function filterByType(type, btnEl) {
+    currentType = type;
+    document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+    btnEl.classList.add('active');
+    applyFilters();
+  }
+
+  function searchPrograms() { applyFilters(); }
+
+  function applyFilters() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    let filtered = allPrograms;
+    if (currentType) filtered = filtered.filter(p => p.type === currentType);
+    if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || p.field.toLowerCase().includes(q));
+    renderPrograms(filtered);
+  }
+
+  function openDetail(p) {
+    document.getElementById('detailBadge').innerHTML = `<span class="prog-type-badge ${p.type==='diploma'?'sky':''}">${p.type}</span>`;
+    document.getElementById('detailName').textContent = p.name;
+    document.getElementById('detailDuration').textContent = p.duration;
+    document.getElementById('detailField').textContent = p.field;
+    document.getElementById('detailFee').textContent = 'UGX ' + Number(p.fee_per_semester).toLocaleString();
+
+    toggleRow('descRow', 'detailDesc', p.description);
+    toggleRow('reqRow', 'detailReq', p.entry_requirements);
+    toggleRow('careerRow', 'detailCareer', p.career_outcomes);
+    toggleRow('intakeRow', 'detailIntake', p.intake_months);
+
+    document.getElementById('detailModal').classList.add('open');
+  }
+
+  function toggleRow(rowId, contentId, value) {
+    const row = document.getElementById(rowId);
+    if (value) { row.style.display = 'block'; document.getElementById(contentId).textContent = value; }
+    else { row.style.display = 'none'; }
+  }
+
+  function closeDetail() { document.getElementById('detailModal').classList.remove('open'); }
+  document.getElementById('detailModal')?.addEventListener('click', e => { if (e.target.id === 'detailModal') closeDetail(); });
+
+  loadPrograms();
+</script>
+</body>
+</html>
