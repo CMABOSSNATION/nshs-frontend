@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Courses — NSHS Admin</title>
+  <link rel="stylesheet" href="../css/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><span class="sidebar-logo-fallback" style="display:none">N</span></div>
+      <div><div class="sidebar-title">NSHS Admin</div><div class="sidebar-subtitle">To Serve & Care</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main</div>
+      <div class="nav-item " onclick="goto('dashboard.html')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-section-title">Admissions</div>
+      <div class="nav-item " onclick="goto('applications.html')"><span class="nav-icon">📝</span> Applications</div>
+      <div class="nav-item " onclick="goto('students.html')"><span class="nav-icon">🎓</span> Students</div>
+      <div class="nav-section-title">Academic</div>
+      <div class="nav-item " onclick="goto('programs.html')"><span class="nav-icon">📚</span> Programmes</div>
+      <div class="nav-item active" onclick="goto('courses.html')"><span class="nav-icon">📖</span> Courses</div>
+      <div class="nav-item " onclick="goto('results.html')"><span class="nav-icon">📋</span> Results</div>
+      <div class="nav-item " onclick="goto('timetables.html')"><span class="nav-icon">🗓️</span> Timetables</div>
+      <div class="nav-section-title">Finance</div>
+      <div class="nav-item " onclick="goto('fees.html')"><span class="nav-icon">💰</span> Fees & Payments</div>
+      <div class="nav-section-title">Content</div>
+      <div class="nav-item " onclick="goto('news.html')"><span class="nav-icon">📰</span> News & Events</div>
+      <div class="nav-item " onclick="goto('gallery.html')"><span class="nav-icon">🖼️</span> Gallery</div>
+      <div class="nav-item " onclick="goto('certificates.html')"><span class="nav-icon">🏅</span> Certificates</div>
+      <div class="nav-section-title">System</div>
+      <div class="nav-item " onclick="goto('staff.html')"><span class="nav-icon">👥</span> Staff Users</div>
+      <div class="nav-item " onclick="goto('notifications.html')"><span class="nav-icon">📢</span> Broadcast SMS</div>
+      <div class="nav-item " onclick="goto('reports.html')"><span class="nav-icon">📈</span> Reports</div>
+      <div class="nav-item " onclick="goto('audit.html')"><span class="nav-icon">🔒</span> Audit Logs</div>
+      <div class="nav-item " onclick="goto('contact.html')"><span class="nav-icon">✉️</span> Messages</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar user-initial">A</div>
+        <div><div class="sidebar-user-name user-name">Admin</div><div class="sidebar-user-role user-role">admin</div></div>
+        <span class="sidebar-logout" onclick="ADMIN.logout()">🚪</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <button class="topbar-menu-btn" id="sidebarToggle">☰</button>
+      <div class="topbar-title">Courses</div>
+      <div class="topbar-right">
+        
+        <div class="topbar-user"><div class="topbar-user-avatar user-initial">A</div><span class="topbar-user-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="page-header-row">
+        <div class="page-header"><h1>Courses</h1><p>Manage course units for each programme.</p></div>
+        <button class="btn btn-gold" onclick="openCreate()">+ New Course</button>
+      </div>
+
+      <div class="filter-bar">
+        <select class="filter-select" id="programFilter" onchange="loadCourses()"><option value="">All Programmes</option></select>
+        <select class="filter-select" id="semesterFilter" onchange="loadCourses()">
+          <option value="">All Semesters</option>
+          <option value="1">Semester 1</option><option value="2">Semester 2</option>
+          <option value="3">Semester 3</option><option value="4">Semester 4</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Code</th><th>Course Name</th><th>Programme</th><th>Semester</th><th>Credits</th><th>Actions</th></tr></thead>
+            <tbody id="coursesTable"><tr><td colspan="6"><div class="loader"><div class="spinner"></div> Loading...</div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="courseModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">New Course</span><button class="modal-close" onclick="closeModal('courseModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Programme *</label><select class="form-control" id="courseProgram"><option value="">Select Programme</option></select></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Course Code *</label><input type="text" class="form-control" id="courseCode" placeholder="e.g. NUR101"/></div>
+        <div class="form-group"><label class="form-label">Credits</label><input type="number" class="form-control" id="courseCredits" placeholder="3" value="3"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Course Name *</label><input type="text" class="form-control" id="courseName" placeholder="e.g. Fundamentals of Nursing"/></div>
+      <div class="form-group"><label class="form-label">Semester *</label><select class="form-control" id="courseSemester"><option value="1">Semester 1</option><option value="2">Semester 2</option><option value="3">Semester 3</option><option value="4">Semester 4</option></select></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('courseModal')">Cancel</button><button class="btn btn-gold" onclick="saveCourse()">Save Course</button></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/admin.js"></script>
+<script>
+  ADMIN.init();
+  function goto(page) { window.location.href = page; }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  let allCourses = [];
+
+  async function loadProgramOptions() {
+    const data = await ADMIN.get('/programs');
+    if (data.success) {
+      [document.getElementById('programFilter'), document.getElementById('courseProgram')].forEach(sel => {
+        data.data.forEach(p => { const o = document.createElement('option'); o.value = p.id; o.textContent = p.name; sel.appendChild(o.cloneNode(true)); });
+      });
+    }
+  }
+
+  async function loadCourses() {
+    const program = document.getElementById('programFilter').value;
+    const semester = document.getElementById('semesterFilter').value;
+    let url = '/courses?';
+    if (program) url += `program_id=${program}&`;
+    if (semester) url += `semester=${semester}`;
+    const tbody = document.getElementById('coursesTable');
+    tbody.innerHTML = '<tr><td colspan="6"><div class="loader"><div class="spinner"></div></div></td></tr>';
+    try {
+      const data = await ADMIN.get(url);
+      allCourses = data.data || [];
+      if (!allCourses.length) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📖</div><h3>No Courses</h3><p>Add courses to get started.</p></div></td></tr>'; return; }
+      tbody.innerHTML = allCourses.map(c => `
+        <tr>
+          <td><strong style="font-family:var(--font-heading);color:var(--navy)">${c.code}</strong></td>
+          <td>${c.name}</td>
+          <td style="font-size:13px">${c.program_name || '—'}</td>
+          <td><span class="badge badge-navy">Sem ${c.semester}</span></td>
+          <td>${c.credits}</td>
+          <td>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-outline btn-sm" onclick='editCourse(${JSON.stringify(c)})'>Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteCourse(${c.id})">Delete</button>
+            </div>
+          </td>
+        </tr>`).join('');
+    } catch { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--danger)">Failed to load</td></tr>'; }
+  }
+
+  let editingCourseId = null;
+
+  function openCreate() {
+    editingCourseId = null;
+    ['courseCode','courseName'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('courseCredits').value = 3;
+    document.getElementById('courseModal').querySelector('.modal-title').textContent = 'New Course';
+    document.getElementById('courseModal').classList.add('open');
+  }
+
+  function editCourse(c) {
+    editingCourseId = c.id;
+    document.getElementById('courseProgram').value = c.program_id;
+    document.getElementById('courseCode').value = c.code;
+    document.getElementById('courseName').value = c.name;
+    document.getElementById('courseSemester').value = c.semester;
+    document.getElementById('courseCredits').value = c.credits;
+    document.getElementById('courseModal').querySelector('.modal-title').textContent = 'Edit Course';
+    document.getElementById('courseModal').classList.add('open');
+  }
+
+  async function saveCourse() {
+    const payload = {
+      program_id: document.getElementById('courseProgram').value,
+      code: document.getElementById('courseCode').value.trim(),
+      name: document.getElementById('courseName').value.trim(),
+      semester: document.getElementById('courseSemester').value,
+      credits: document.getElementById('courseCredits').value
+    };
+    if (!payload.program_id || !payload.code || !payload.name) { ADMIN.toast('Programme, code and name are required', 'error'); return; }
+    const data = editingCourseId ? await ADMIN.put(`/courses/${editingCourseId}`, payload) : await ADMIN.post('/courses', payload);
+    if (data.success) { ADMIN.toast(editingCourseId ? 'Course updated!' : 'Course added!', 'success'); closeModal('courseModal'); loadCourses(); }
+    else ADMIN.toast(data.message || 'Failed to save', 'error');
+  }
+
+  async function deleteCourse(id) {
+    if (!ADMIN.confirm('Delete this course?')) return;
+    const data = await ADMIN.delete(`/courses/${id}`);
+    if (data.success) { ADMIN.toast('Course removed', 'success'); loadCourses(); }
+    else ADMIN.toast(data.message || 'Cannot delete - results exist for this course', 'error');
+  }
+
+  loadProgramOptions();
+  loadCourses();
+</script>
+</body>
+</html>

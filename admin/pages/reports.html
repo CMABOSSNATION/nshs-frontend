@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reports — NSHS Admin</title>
+  <link rel="stylesheet" href="../css/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><span class="sidebar-logo-fallback" style="display:none">N</span></div>
+      <div><div class="sidebar-title">NSHS Admin</div><div class="sidebar-subtitle">To Serve & Care</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main</div>
+      <div class="nav-item " onclick="goto('dashboard.html')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-section-title">Admissions</div>
+      <div class="nav-item " onclick="goto('applications.html')"><span class="nav-icon">📝</span> Applications</div>
+      <div class="nav-item " onclick="goto('students.html')"><span class="nav-icon">🎓</span> Students</div>
+      <div class="nav-section-title">Academic</div>
+      <div class="nav-item " onclick="goto('programs.html')"><span class="nav-icon">📚</span> Programmes</div>
+      <div class="nav-item " onclick="goto('courses.html')"><span class="nav-icon">📖</span> Courses</div>
+      <div class="nav-item " onclick="goto('results.html')"><span class="nav-icon">📋</span> Results</div>
+      <div class="nav-item " onclick="goto('timetables.html')"><span class="nav-icon">🗓️</span> Timetables</div>
+      <div class="nav-section-title">Finance</div>
+      <div class="nav-item " onclick="goto('fees.html')"><span class="nav-icon">💰</span> Fees & Payments</div>
+      <div class="nav-section-title">Content</div>
+      <div class="nav-item " onclick="goto('news.html')"><span class="nav-icon">📰</span> News & Events</div>
+      <div class="nav-item " onclick="goto('gallery.html')"><span class="nav-icon">🖼️</span> Gallery</div>
+      <div class="nav-item " onclick="goto('certificates.html')"><span class="nav-icon">🏅</span> Certificates</div>
+      <div class="nav-section-title">System</div>
+      <div class="nav-item " onclick="goto('staff.html')"><span class="nav-icon">👥</span> Staff Users</div>
+      <div class="nav-item " onclick="goto('notifications.html')"><span class="nav-icon">📢</span> Broadcast SMS</div>
+      <div class="nav-item active" onclick="goto('reports.html')"><span class="nav-icon">📈</span> Reports</div>
+      <div class="nav-item " onclick="goto('audit.html')"><span class="nav-icon">🔒</span> Audit Logs</div>
+      <div class="nav-item " onclick="goto('contact.html')"><span class="nav-icon">✉️</span> Messages</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar user-initial">A</div>
+        <div><div class="sidebar-user-name user-name">Admin</div><div class="sidebar-user-role user-role">admin</div></div>
+        <span class="sidebar-logout" onclick="ADMIN.logout()">🚪</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <button class="topbar-menu-btn" id="sidebarToggle">☰</button>
+      <div class="topbar-title">Reports</div>
+      <div class="topbar-right">
+        
+        <div class="topbar-user"><div class="topbar-user-avatar user-initial">A</div><span class="topbar-user-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="page-header"><h1>Reports</h1><p>Analytics and institutional insights.</p></div>
+
+      <div class="stats-grid" id="reportStats">
+        <div class="stat-card"><div class="stat-icon navy">🎓</div><div><div class="stat-num" id="rStudents">—</div><div class="stat-label">Total Students</div></div></div>
+        <div class="stat-card"><div class="stat-icon gold">📝</div><div><div class="stat-num" id="rApps">—</div><div class="stat-label">Total Applications</div></div></div>
+        <div class="stat-card"><div class="stat-icon green">💰</div><div><div class="stat-num" id="rFees">—</div><div class="stat-label">Total Collected</div></div></div>
+        <div class="stat-card"><div class="stat-icon sky">📚</div><div><div class="stat-num" id="rPrograms">—</div><div class="stat-label">Active Programmes</div></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">Fee Collection By Programme</span></div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Programme</th><th>Students Paid</th><th>Total Collected</th></tr></thead>
+              <tbody id="feeReportTable"><tr><td colspan="3"><div class="loader"><div class="spinner"></div></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:24px">
+        <div class="card-header"><span class="card-title">Application Trends (Last 12 Months)</span></div>
+        <div class="card-body">
+          <div id="trendsChart" style="display:flex;align-items:flex-end;gap:8px;height:200px;overflow-x:auto;padding:0 8px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/admin.js"></script>
+<script>
+  ADMIN.init();
+  function goto(page) { window.location.href = page; }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  async function loadReports() {
+    try {
+      const dash = await ADMIN.get('/reports/dashboard');
+      if (dash.success) {
+        document.getElementById('rStudents').textContent = dash.data.total_students || 0;
+        document.getElementById('rApps').textContent = dash.data.total_applications || 0;
+        document.getElementById('rFees').textContent = 'UGX ' + Number(dash.data.total_collected || 0).toLocaleString();
+        document.getElementById('rPrograms').textContent = dash.data.by_program?.length || 0;
+
+        if (dash.data.monthly_applications?.length) {
+          const chartEl = document.getElementById('trendsChart');
+          const data = dash.data.monthly_applications.slice(0, 12).reverse();
+          const max = Math.max(...data.map(m => m.count), 1);
+          chartEl.innerHTML = data.map(m => `
+            <div style="min-width:50px;display:flex;flex-direction:column;align-items:center;gap:6px">
+              <span style="font-size:11px;font-weight:700;color:var(--navy)">${m.count}</span>
+              <div style="width:30px;background:linear-gradient(180deg,var(--gold),var(--navy));border-radius:4px 4px 0 0;height:${Math.max(10,(m.count/max)*150)}px"></div>
+              <span style="font-size:9px;color:var(--gray-400)">${m.month}</span>
+            </div>`).join('');
+        }
+      }
+
+      const feeReport = await ADMIN.get('/reports/fee-collection');
+      const tbody = document.getElementById('feeReportTable');
+      if (feeReport.success && feeReport.data?.length) {
+        tbody.innerHTML = feeReport.data.map(r => `
+          <tr>
+            <td><strong>${r.program}</strong></td>
+            <td>${r.paid_students}</td>
+            <td><strong style="color:var(--navy)">UGX ${Number(r.total_collected || 0).toLocaleString()}</strong></td>
+          </tr>`).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="3"><div class="empty-state" style="padding:20px"><p>No fee data yet</p></div></td></tr>';
+      }
+    } catch (err) { console.error(err); }
+  }
+
+  loadReports();
+</script>
+</body>
+</html>

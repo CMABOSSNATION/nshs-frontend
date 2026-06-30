@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fees & Payments — NSHS Admin</title>
+  <link rel="stylesheet" href="../css/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><span class="sidebar-logo-fallback" style="display:none">N</span></div>
+      <div><div class="sidebar-title">NSHS Admin</div><div class="sidebar-subtitle">To Serve & Care</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main</div>
+      <div class="nav-item" onclick="goto('dashboard.html')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-section-title">Admissions</div>
+      <div class="nav-item" onclick="goto('applications.html')"><span class="nav-icon">📝</span> Applications</div>
+      <div class="nav-item" onclick="goto('students.html')"><span class="nav-icon">🎓</span> Students</div>
+      <div class="nav-section-title">Academic</div>
+      <div class="nav-item" onclick="goto('programs.html')"><span class="nav-icon">📚</span> Programmes</div>
+      <div class="nav-item" onclick="goto('courses.html')"><span class="nav-icon">📖</span> Courses</div>
+      <div class="nav-item" onclick="goto('results.html')"><span class="nav-icon">📋</span> Results</div>
+      <div class="nav-item" onclick="goto('timetables.html')"><span class="nav-icon">🗓️</span> Timetables</div>
+      <div class="nav-section-title">Finance</div>
+      <div class="nav-item active" onclick="goto('fees.html')"><span class="nav-icon">💰</span> Fees & Payments</div>
+      <div class="nav-section-title">Content</div>
+      <div class="nav-item" onclick="goto('news.html')"><span class="nav-icon">📰</span> News & Events</div>
+      <div class="nav-item" onclick="goto('gallery.html')"><span class="nav-icon">🖼️</span> Gallery</div>
+      <div class="nav-item" onclick="goto('certificates.html')"><span class="nav-icon">🏅</span> Certificates</div>
+      <div class="nav-section-title">System</div>
+      <div class="nav-item" onclick="goto('staff.html')"><span class="nav-icon">👥</span> Staff Users</div>
+      <div class="nav-item" onclick="goto('notifications.html')"><span class="nav-icon">📢</span> Broadcast SMS</div>
+      <div class="nav-item" onclick="goto('reports.html')"><span class="nav-icon">📈</span> Reports</div>
+      <div class="nav-item" onclick="goto('audit.html')"><span class="nav-icon">🔒</span> Audit Logs</div>
+      <div class="nav-item" onclick="goto('contact.html')"><span class="nav-icon">✉️</span> Messages</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar user-initial">A</div>
+        <div><div class="sidebar-user-name user-name">Admin</div><div class="sidebar-user-role user-role">admin</div></div>
+        <span class="sidebar-logout" onclick="ADMIN.logout()">🚪</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <button class="topbar-menu-btn" id="sidebarToggle">☰</button>
+      <div class="topbar-title">Fees & Payments</div>
+      <div class="topbar-right">
+        <div class="topbar-user"><div class="topbar-user-avatar user-initial">A</div><span class="topbar-user-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="page-header"><h1>Fees & Payments</h1><p>Manage student fees, payments and outstanding balances.</p></div>
+
+      <!-- Summary Cards -->
+      <div class="stats-grid" id="feeStats">
+        <div class="stat-card"><div class="stat-icon gold">💰</div><div><div class="stat-num" id="totalCollected">—</div><div class="stat-label">Total Collected</div></div></div>
+        <div class="stat-card"><div class="stat-icon navy">📱</div><div><div class="stat-num" id="mtnTotal">—</div><div class="stat-label">MTN MoMo</div></div></div>
+        <div class="stat-card"><div class="stat-icon sky">📱</div><div><div class="stat-num" id="airtelTotal">—</div><div class="stat-label">Airtel Money</div></div></div>
+        <div class="stat-card"><div class="stat-icon green">🏦</div><div><div class="stat-num" id="cashTotal">—</div><div class="stat-label">Cash/Bank</div></div></div>
+      </div>
+
+      <!-- Tabs -->
+      <div style="display:flex;gap:0;margin-bottom:24px;border-bottom:2px solid var(--gray-200)">
+        <button class="btn btn-outline" style="border-radius:0;border-bottom:3px solid var(--navy);color:var(--navy)" id="tab1" onclick="switchTab('payments')">All Payments</button>
+        <button class="btn btn-outline" style="border-radius:0" id="tab2" onclick="switchTab('outstanding')">Outstanding Balances</button>
+        <button class="btn btn-outline" style="border-radius:0" id="tab3" onclick="switchTab('assign')">Assign Fees</button>
+        <button class="btn btn-outline" style="border-radius:0" id="tab4" onclick="switchTab('manual')">Record Payment</button>
+      </div>
+
+      <!-- Payments Tab -->
+      <div id="paymentsTab">
+        <div class="filter-bar">
+          <select class="filter-select" id="semesterFilter" onchange="loadPayments()">
+            <option value="">All Semesters</option>
+            <option value="Semester 1">Semester 1</option>
+            <option value="Semester 2">Semester 2</option>
+          </select>
+          <select class="filter-select" id="yearFilter" onchange="loadPayments()">
+            <option value="">All Years</option>
+            <option value="2025/2026">2025/2026</option>
+            <option value="2024/2025">2024/2025</option>
+          </select>
+          <select class="filter-select" id="statusFilter" onchange="loadPayments()">
+            <option value="">All Status</option>
+            <option value="completed">Completed</option>
+            <option value="pending">Pending</option>
+            <option value="failed">Failed</option>
+          </select>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Receipt No</th><th>Student</th><th>Amount</th><th>Method</th><th>Semester</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="paymentsTable"><tr><td colspan="7"><div class="loader"><div class="spinner"></div></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Outstanding Tab -->
+      <div id="outstandingTab" style="display:none">
+        <div class="filter-bar">
+          <select class="filter-select" id="outProgramFilter" onchange="loadOutstanding()">
+            <option value="">All Programmes</option>
+          </select>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Student No</th><th>Name</th><th>Programme</th><th>Total Charged</th><th>Total Paid</th><th>Balance</th><th>Phone</th></tr></thead>
+              <tbody id="outstandingTable"><tr><td colspan="7"><div class="loader"><div class="spinner"></div></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Assign Fees Tab -->
+      <div id="assignTab" style="display:none">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Assign Fees To Programme</span></div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Programme *</label>
+                <select class="form-control" id="assignProgram"><option value="">Select Programme</option></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Amount (UGX) *</label>
+                <input type="number" class="form-control" id="assignAmount" placeholder="e.g. 850000"/>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Semester *</label>
+                <select class="form-control" id="assignSemester">
+                  <option value="Semester 1">Semester 1</option>
+                  <option value="Semester 2">Semester 2</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Academic Year *</label>
+                <select class="form-control" id="assignYear">
+                  <option value="2025/2026">2025/2026</option>
+                  <option value="2024/2025">2024/2025</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Description</label>
+                <input type="text" class="form-control" id="assignDesc" placeholder="e.g. Tuition Fee Semester 1"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Due Date</label>
+                <input type="date" class="form-control" id="assignDue"/>
+              </div>
+            </div>
+            <button class="btn btn-gold" onclick="assignFees()">Assign Fees & Notify Students →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manual Payment Tab -->
+      <div id="manualTab" style="display:none">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Record Manual Payment</span></div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Student Number *</label>
+                <input type="text" class="form-control" id="manualStudent" placeholder="e.g. NIHS/25/0001"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Amount (UGX) *</label>
+                <input type="number" class="form-control" id="manualAmount" placeholder="e.g. 500000"/>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Payment Method *</label>
+                <select class="form-control" id="manualMethod">
+                  <option value="cash">Cash</option>
+                  <option value="bank">Bank Transfer</option>
+                  <option value="mtn_momo">MTN MoMo</option>
+                  <option value="airtel_money">Airtel Money</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Semester *</label>
+                <select class="form-control" id="manualSemester">
+                  <option value="Semester 1">Semester 1</option>
+                  <option value="Semester 2">Semester 2</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Academic Year *</label>
+                <select class="form-control" id="manualYear">
+                  <option value="2025/2026">2025/2026</option>
+                  <option value="2024/2025">2024/2025</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Description</label>
+                <input type="text" class="form-control" id="manualDesc" placeholder="e.g. Tuition payment"/>
+              </div>
+            </div>
+            <button class="btn btn-gold" onclick="recordPayment()">Record Payment →</button>
+            <div id="receiptResult" style="margin-top:16px;display:none"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/admin.js"></script>
+<script>
+  ADMIN.init();
+  function goto(page) { window.location.href = page; }
+
+  function switchTab(tab) {
+    ['payments','outstanding','assign','manual'].forEach(t => {
+      document.getElementById(t+'Tab').style.display = t === tab ? 'block' : 'none';
+      const btn = document.getElementById('tab'+(['payments','outstanding','assign','manual'].indexOf(t)+1));
+      if (btn) btn.style.borderBottom = t === tab ? '3px solid var(--navy)' : 'none';
+      if (btn) btn.style.color = t === tab ? 'var(--navy)' : 'var(--gray-700)';
+    });
+    if (tab === 'outstanding') loadOutstanding();
+    if (tab === 'payments') loadPayments();
+  }
+
+  async function loadSummary() {
+    try {
+      const data = await ADMIN.get('/fees/summary');
+      if (!data.success) return;
+      let mtn = 0, airtel = 0, cash = 0, total = 0;
+      data.data.byMethod?.forEach(m => {
+        total += Number(m.total || 0);
+        if (m.method === 'mtn_momo') mtn = Number(m.total);
+        if (m.method === 'airtel_money') airtel = Number(m.total);
+        if (['cash','bank','other'].includes(m.method)) cash += Number(m.total);
+      });
+      document.getElementById('totalCollected').textContent = 'UGX ' + Number(data.data.grand_total||0).toLocaleString();
+      document.getElementById('mtnTotal').textContent = 'UGX ' + mtn.toLocaleString();
+      document.getElementById('airtelTotal').textContent = 'UGX ' + airtel.toLocaleString();
+      document.getElementById('cashTotal').textContent = 'UGX ' + cash.toLocaleString();
+    } catch {}
+  }
+
+  async function loadPayments() {
+    const semester = document.getElementById('semesterFilter').value;
+    const year     = document.getElementById('yearFilter').value;
+    const status   = document.getElementById('statusFilter').value;
+    let url = '/fees/all?limit=30';
+    if (semester) url += `&semester=${encodeURIComponent(semester)}`;
+    if (year)     url += `&academic_year=${encodeURIComponent(year)}`;
+    if (status)   url += `&status=${status}`;
+
+    const tbody = document.getElementById('paymentsTable');
+    tbody.innerHTML = '<tr><td colspan="7"><div class="loader"><div class="spinner"></div></div></td></tr>';
+    try {
+      const data = await ADMIN.get(url);
+      const rows = data.data || [];
+      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state" style="padding:24px"><div class="empty-icon">💰</div><p>No payments found</p></div></td></tr>'; return; }
+      tbody.innerHTML = rows.map(p => `
+        <tr>
+          <td><strong style="font-family:var(--font-heading);color:var(--navy)">${p.receipt_no || '—'}</strong></td>
+          <td><strong>${p.full_name}</strong><br><small style="color:var(--gray-400)">${p.student_number}</small></td>
+          <td><strong style="color:var(--navy)">UGX ${Number(p.amount).toLocaleString()}</strong></td>
+          <td><span class="badge badge-navy">${p.method?.replace(/_/g,' ')}</span></td>
+          <td style="font-size:13px">${p.semester || '—'}</td>
+          <td>${ADMIN.statusBadge(p.status)}</td>
+          <td style="font-size:12px;color:var(--gray-400)">${ADMIN.formatDate(p.created_at)}</td>
+        </tr>`).join('');
+    } catch {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--danger)">Failed to load</td></tr>';
+    }
+  }
+
+  async function loadOutstanding() {
+    const program = document.getElementById('outProgramFilter').value;
+    let url = '/fees/outstanding';
+    if (program) url += `?program_id=${program}`;
+    const tbody = document.getElementById('outstandingTable');
+    tbody.innerHTML = '<tr><td colspan="7"><div class="loader"><div class="spinner"></div></div></td></tr>';
+    try {
+      const data = await ADMIN.get(url);
+      const rows = data.data || [];
+      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state" style="padding:24px"><div class="empty-icon">✅</div><h3>All Cleared!</h3><p>No outstanding balances.</p></div></td></tr>'; return; }
+      tbody.innerHTML = rows.map(r => `
+        <tr>
+          <td><strong style="font-family:var(--font-heading);color:var(--navy)">${r.student_number}</strong></td>
+          <td>${r.full_name}</td>
+          <td style="font-size:13px">${r.program}</td>
+          <td>UGX ${Number(r.total_charged).toLocaleString()}</td>
+          <td style="color:var(--success)">UGX ${Number(r.total_paid).toLocaleString()}</td>
+          <td><strong style="color:var(--danger)">UGX ${Number(r.balance).toLocaleString()}</strong></td>
+          <td>${r.phone || '—'}</td>
+        </tr>`).join('');
+    } catch {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--danger);padding:24px">Failed to load</td></tr>';
+    }
+  }
+
+  async function loadPrograms() {
+    const data = await ADMIN.get('/programs');
+    if (data.success) {
+      [document.getElementById('assignProgram'), document.getElementById('outProgramFilter')].forEach(sel => {
+        data.data.forEach(p => { const o = document.createElement('option'); o.value = p.id; o.textContent = p.name; sel.appendChild(o.cloneNode(true)); });
+      });
+    }
+  }
+
+  async function assignFees() {
+    const program_id   = document.getElementById('assignProgram').value;
+    const amount       = document.getElementById('assignAmount').value;
+    const semester     = document.getElementById('assignSemester').value;
+    const academic_year = document.getElementById('assignYear').value;
+    const description  = document.getElementById('assignDesc').value || `Tuition Fee - ${semester}`;
+    const due_date     = document.getElementById('assignDue').value;
+    if (!program_id || !amount) { ADMIN.toast('Programme and amount are required', 'error'); return; }
+    const data = await ADMIN.post('/fees/assign-program', { program_id, amount: Number(amount), description, semester, academic_year, due_date });
+    if (data.success) { ADMIN.toast(data.message, 'success'); loadSummary(); }
+    else ADMIN.toast(data.message || 'Failed to assign fees', 'error');
+  }
+
+  async function recordPayment() {
+    const studentNumber = document.getElementById('manualStudent').value.trim();
+    const amount        = document.getElementById('manualAmount').value;
+    const method        = document.getElementById('manualMethod').value;
+    const semester      = document.getElementById('manualSemester').value;
+    const academic_year = document.getElementById('manualYear').value;
+    const description   = document.getElementById('manualDesc').value || 'Manual payment';
+    if (!studentNumber || !amount) { ADMIN.toast('Student number and amount required', 'error'); return; }
+
+    // Find student ID first
+    const students = await ADMIN.get(`/students?search=${encodeURIComponent(studentNumber)}&limit=1`);
+    const student = students.data?.[0];
+    if (!student) { ADMIN.toast('Student not found', 'error'); return; }
+
+    const data = await ADMIN.post('/fees/manual', { student_id: student.id, amount: Number(amount), method, description, semester, academic_year });
+    if (data.success) {
+      ADMIN.toast(`Payment recorded! Receipt: ${data.data.receiptNo}`, 'success');
+      document.getElementById('receiptResult').innerHTML = `<div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);padding:14px;border-radius:var(--radius)"><strong style="color:var(--success)">✅ Payment Recorded</strong><br>Receipt No: <strong>${data.data.receiptNo}</strong></div>`;
+      document.getElementById('receiptResult').style.display = 'block';
+      loadSummary();
+    } else {
+      ADMIN.toast(data.message || 'Failed to record payment', 'error');
+    }
+  }
+
+  loadSummary();
+  loadPayments();
+  loadPrograms();
+</script>
+</body>
+</html>

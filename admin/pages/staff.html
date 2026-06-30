@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Staff Users — NSHS Admin</title>
+  <link rel="stylesheet" href="../css/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><span class="sidebar-logo-fallback" style="display:none">N</span></div>
+      <div><div class="sidebar-title">NSHS Admin</div><div class="sidebar-subtitle">To Serve & Care</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main</div>
+      <div class="nav-item " onclick="goto('dashboard.html')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-section-title">Admissions</div>
+      <div class="nav-item " onclick="goto('applications.html')"><span class="nav-icon">📝</span> Applications</div>
+      <div class="nav-item " onclick="goto('students.html')"><span class="nav-icon">🎓</span> Students</div>
+      <div class="nav-section-title">Academic</div>
+      <div class="nav-item " onclick="goto('programs.html')"><span class="nav-icon">📚</span> Programmes</div>
+      <div class="nav-item " onclick="goto('courses.html')"><span class="nav-icon">📖</span> Courses</div>
+      <div class="nav-item " onclick="goto('results.html')"><span class="nav-icon">📋</span> Results</div>
+      <div class="nav-item " onclick="goto('timetables.html')"><span class="nav-icon">🗓️</span> Timetables</div>
+      <div class="nav-section-title">Finance</div>
+      <div class="nav-item " onclick="goto('fees.html')"><span class="nav-icon">💰</span> Fees & Payments</div>
+      <div class="nav-section-title">Content</div>
+      <div class="nav-item " onclick="goto('news.html')"><span class="nav-icon">📰</span> News & Events</div>
+      <div class="nav-item " onclick="goto('gallery.html')"><span class="nav-icon">🖼️</span> Gallery</div>
+      <div class="nav-item " onclick="goto('certificates.html')"><span class="nav-icon">🏅</span> Certificates</div>
+      <div class="nav-section-title">System</div>
+      <div class="nav-item active" onclick="goto('staff.html')"><span class="nav-icon">👥</span> Staff Users</div>
+      <div class="nav-item " onclick="goto('notifications.html')"><span class="nav-icon">📢</span> Broadcast SMS</div>
+      <div class="nav-item " onclick="goto('reports.html')"><span class="nav-icon">📈</span> Reports</div>
+      <div class="nav-item " onclick="goto('audit.html')"><span class="nav-icon">🔒</span> Audit Logs</div>
+      <div class="nav-item " onclick="goto('contact.html')"><span class="nav-icon">✉️</span> Messages</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar user-initial">A</div>
+        <div><div class="sidebar-user-name user-name">Admin</div><div class="sidebar-user-role user-role">admin</div></div>
+        <span class="sidebar-logout" onclick="ADMIN.logout()">🚪</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <button class="topbar-menu-btn" id="sidebarToggle">☰</button>
+      <div class="topbar-title">Staff Users</div>
+      <div class="topbar-right">
+        
+        <div class="topbar-user"><div class="topbar-user-avatar user-initial">A</div><span class="topbar-user-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="page-header-row">
+        <div class="page-header"><h1>Staff Users</h1><p>Manage admin and staff accounts.</p></div>
+        <button class="btn btn-gold" onclick="openCreate()">+ Add Staff</button>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="staffTable"><tr><td colspan="6"><div class="loader"><div class="spinner"></div> Loading...</div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="staffModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Add Staff Member</span><button class="modal-close" onclick="closeModal('staffModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Full Name *</label><input type="text" class="form-control" id="staffName" placeholder="John Okello"/></div>
+      <div class="form-group"><label class="form-label">Email *</label><input type="email" class="form-control" id="staffEmail" placeholder="staff@nshs.ac.ug"/></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Role *</label>
+          <select class="form-control" id="staffRole">
+            <option value="registrar">Registrar</option>
+            <option value="admin">Admin</option>
+            <option value="lecturer">Lecturer</option>
+            <option value="editor">Editor</option>
+            <option value="accounts">Accounts</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Phone</label><input type="tel" class="form-control" id="staffPhone" placeholder="0768 177 177"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Department</label><input type="text" class="form-control" id="staffDept" placeholder="e.g. Nursing Department"/></div>
+      <div class="form-group"><label class="form-label">Temporary Password *</label><input type="text" class="form-control" id="staffPassword" placeholder="Min 8 characters"/></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('staffModal')">Cancel</button><button class="btn btn-gold" onclick="saveStaff()">Create Account</button></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/admin.js"></script>
+<script>
+  ADMIN.init();
+  function goto(page) { window.location.href = page; }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  async function loadStaff() {
+    const tbody = document.getElementById('staffTable');
+    tbody.innerHTML = '<tr><td colspan="6"><div class="loader"><div class="spinner"></div></div></td></tr>';
+    try {
+      const data = await ADMIN.get('/staff');
+      const rows = data.data || [];
+      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">👥</div><h3>No Staff Yet</h3></div></td></tr>'; return; }
+      tbody.innerHTML = rows.map(s => `
+        <tr>
+          <td><strong>${s.name}</strong></td>
+          <td style="font-size:13px">${s.email}</td>
+          <td><span class="badge badge-navy">${s.role}</span></td>
+          <td style="font-size:13px">${s.department || '—'}</td>
+          <td>${s.status === 'active' ? '<span class="badge badge-approved">Active</span>' : '<span class="badge badge-rejected">Inactive</span>'}</td>
+          <td><button class="btn btn-outline btn-sm" onclick="toggleStatus(${s.id}, '${s.status}')">${s.status === 'active' ? 'Deactivate' : 'Activate'}</button></td>
+        </tr>`).join('');
+    } catch { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--danger)">Failed to load</td></tr>'; }
+  }
+
+  function openCreate() {
+    ['staffName','staffEmail','staffPhone','staffDept','staffPassword'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('staffModal').classList.add('open');
+  }
+
+  async function saveStaff() {
+    const payload = {
+      name: document.getElementById('staffName').value.trim(),
+      email: document.getElementById('staffEmail').value.trim(),
+      role: document.getElementById('staffRole').value,
+      phone: document.getElementById('staffPhone').value.trim(),
+      department: document.getElementById('staffDept').value.trim(),
+      password: document.getElementById('staffPassword').value
+    };
+    if (!payload.name || !payload.email || !payload.password || payload.password.length < 8) {
+      ADMIN.toast('Name, email and a password (8+ chars) are required', 'error'); return;
+    }
+    const data = await ADMIN.post('/staff', payload);
+    if (data.success) { ADMIN.toast('Staff account created!', 'success'); closeModal('staffModal'); loadStaff(); }
+    else ADMIN.toast(data.message || 'Failed to create account', 'error');
+  }
+
+  async function toggleStatus(id, currentStatus) {
+    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+    if (!ADMIN.confirm(`${newStatus === 'active' ? 'Activate' : 'Deactivate'} this staff account?`)) return;
+    const data = await ADMIN.put(`/staff/${id}/status`, { status: newStatus });
+    if (data.success) { ADMIN.toast('Status updated', 'success'); loadStaff(); }
+    else ADMIN.toast(data.message || 'Failed', 'error');
+  }
+
+  loadStaff();
+</script>
+</body>
+</html>

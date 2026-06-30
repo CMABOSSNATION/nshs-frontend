@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NSHS Admin — Login</title>
+  <link rel="stylesheet" href="css/admin.css"/>
+  <link rel="icon" href="../images/badge.png" type="image/png"/>
+  <style>
+    body { background: var(--navy-dark); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+    .login-wrap { width: 100%; max-width: 420px; }
+    .login-header { text-align: center; margin-bottom: 32px; }
+    .login-logo {
+      width: 90px; height: 90px; border-radius: 50%;
+      background: white; border: 3px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px; overflow: hidden;
+      box-shadow: 0 0 0 6px rgba(240,165,0,0.15);
+    }
+    .login-logo img { width: 100%; height: 100%; object-fit: contain; }
+    .login-logo-fallback { font-family: var(--font-heading); font-size: 38px; font-weight: 700; color: var(--navy); }
+    .login-school { font-family: var(--font-heading); font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: white; }
+    .login-motto  { font-size: 12px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
+    .login-card   { background: white; border-radius: var(--radius); padding: 36px; box-shadow: 0 24px 64px rgba(0,0,0,0.4); }
+    .login-card h2 { font-family: var(--font-heading); font-size: 22px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--navy); margin-bottom: 8px; }
+    .login-card p  { font-size: 13px; color: var(--gray-500); margin-bottom: 28px; }
+    .login-divider { border: none; border-top: 1px solid var(--gray-200); margin: 24px 0; }
+    .login-footer  { text-align: center; margin-top: 20px; font-size: 12px; color: rgba(255,255,255,0.4); }
+    .login-footer a { color: var(--gold); }
+    .error-msg { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: var(--danger); padding: 12px 14px; border-radius: var(--radius); font-size: 13px; margin-bottom: 16px; display: none; }
+    .password-wrap { position: relative; }
+    .password-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 16px; color: var(--gray-400); }
+  </style>
+</head>
+<body>
+
+<div class="login-wrap">
+  <div class="login-header">
+    <div class="login-logo">
+      <img src="../images/logo.jpg" alt="NSHS"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+      <span class="login-logo-fallback" style="display:none">N</span>
+    </div>
+    <div class="login-school">Nebbi School of Health Sciences</div>
+    <div class="login-motto">To Serve & Care</div>
+  </div>
+
+  <div class="login-card">
+    <h2>Admin Portal</h2>
+    <p>Sign in to manage the NSHS website.</p>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <div class="form-group">
+      <label class="form-label">Email Address</label>
+      <input type="email" class="form-control" id="email" placeholder="admin@nshs.ac.ug" autocomplete="email"/>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <div class="password-wrap">
+        <input type="password" class="form-control" id="password" placeholder="Enter your password" autocomplete="current-password"/>
+        <button class="password-toggle" onclick="togglePassword()" type="button">👁️</button>
+      </div>
+    </div>
+
+    <button class="btn btn-navy" style="width:100%;justify-content:center;margin-top:8px" onclick="login()" id="loginBtn">
+      Sign In →
+    </button>
+
+    <hr class="login-divider"/>
+    <div style="text-align:center">
+      <a href="../index.html" style="font-size:13px;color:var(--gray-400)">← Back to Website</a>
+    </div>
+  </div>
+
+  <div class="login-footer">
+    NSHS Admin v1.0 &nbsp;|&nbsp; Built by <a href="#">CMA Media & Technology</a>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/admin.js"></script>
+<script>
+  // Redirect if already logged in
+  if (ADMIN.isLoggedIn()) window.location.href = 'pages/dashboard.html';
+
+  function togglePassword() {
+    const input = document.getElementById('password');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }
+
+  async function login() {
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const errorMsg = document.getElementById('errorMsg');
+    const btn      = document.getElementById('loginBtn');
+
+    errorMsg.style.display = 'none';
+
+    if (!email || !password) {
+      errorMsg.textContent = 'Please enter your email and password.';
+      errorMsg.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Signing in...';
+
+    try {
+      const data = await ADMIN.post('/auth/login', { email, password });
+
+      if (data.success) {
+        ADMIN.setAuth(data.token, data.user);
+        window.location.href = 'pages/dashboard.html';
+      } else {
+        errorMsg.textContent = data.message || 'Invalid credentials. Please try again.';
+        errorMsg.style.display = 'block';
+      }
+    } catch (err) {
+      errorMsg.textContent = 'Connection failed. Check your internet connection.';
+      errorMsg.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Sign In →';
+    }
+  }
+
+  // Enter key to login
+  document.addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
+</script>
+</body>
+</html>

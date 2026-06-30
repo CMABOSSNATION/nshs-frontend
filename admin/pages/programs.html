@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Programmes — NSHS Admin</title>
+  <link rel="stylesheet" href="../css/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><span class="sidebar-logo-fallback" style="display:none">N</span></div>
+      <div><div class="sidebar-title">NSHS Admin</div><div class="sidebar-subtitle">To Serve & Care</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main</div>
+      <div class="nav-item " onclick="goto('dashboard.html')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-section-title">Admissions</div>
+      <div class="nav-item " onclick="goto('applications.html')"><span class="nav-icon">📝</span> Applications</div>
+      <div class="nav-item " onclick="goto('students.html')"><span class="nav-icon">🎓</span> Students</div>
+      <div class="nav-section-title">Academic</div>
+      <div class="nav-item active" onclick="goto('programs.html')"><span class="nav-icon">📚</span> Programmes</div>
+      <div class="nav-item " onclick="goto('courses.html')"><span class="nav-icon">📖</span> Courses</div>
+      <div class="nav-item " onclick="goto('results.html')"><span class="nav-icon">📋</span> Results</div>
+      <div class="nav-item " onclick="goto('timetables.html')"><span class="nav-icon">🗓️</span> Timetables</div>
+      <div class="nav-section-title">Finance</div>
+      <div class="nav-item " onclick="goto('fees.html')"><span class="nav-icon">💰</span> Fees & Payments</div>
+      <div class="nav-section-title">Content</div>
+      <div class="nav-item " onclick="goto('news.html')"><span class="nav-icon">📰</span> News & Events</div>
+      <div class="nav-item " onclick="goto('gallery.html')"><span class="nav-icon">🖼️</span> Gallery</div>
+      <div class="nav-item " onclick="goto('certificates.html')"><span class="nav-icon">🏅</span> Certificates</div>
+      <div class="nav-section-title">System</div>
+      <div class="nav-item " onclick="goto('staff.html')"><span class="nav-icon">👥</span> Staff Users</div>
+      <div class="nav-item " onclick="goto('notifications.html')"><span class="nav-icon">📢</span> Broadcast SMS</div>
+      <div class="nav-item " onclick="goto('reports.html')"><span class="nav-icon">📈</span> Reports</div>
+      <div class="nav-item " onclick="goto('audit.html')"><span class="nav-icon">🔒</span> Audit Logs</div>
+      <div class="nav-item " onclick="goto('contact.html')"><span class="nav-icon">✉️</span> Messages</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar user-initial">A</div>
+        <div><div class="sidebar-user-name user-name">Admin</div><div class="sidebar-user-role user-role">admin</div></div>
+        <span class="sidebar-logout" onclick="ADMIN.logout()">🚪</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <button class="topbar-menu-btn" id="sidebarToggle">☰</button>
+      <div class="topbar-title">Programmes</div>
+      <div class="topbar-right">
+        
+        <div class="topbar-user"><div class="topbar-user-avatar user-initial">A</div><span class="topbar-user-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="page-header-row">
+        <div class="page-header"><h1>Programmes</h1><p>Manage diploma and certificate programmes.</p></div>
+        <button class="btn btn-gold" onclick="openCreate()">+ New Programme</button>
+      </div>
+
+      <div class="filter-bar">
+        <div class="search-box"><span class="search-icon">🔍</span><input type="text" placeholder="Search programmes..." id="searchInput" oninput="filterPrograms()"/></div>
+        <select class="filter-select" id="typeFilter" onchange="loadPrograms()">
+          <option value="">All Types</option>
+          <option value="diploma">Diploma</option>
+          <option value="certificate">Certificate</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Type</th><th>Field</th><th>Duration</th><th>Fee/Semester</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="programsTable"><tr><td colspan="7"><div class="loader"><div class="spinner"></div> Loading...</div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="progModal">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-header"><span class="modal-title" id="progModalTitle">New Programme</span><button class="modal-close" onclick="closeModal('progModal')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editId"/>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Programme Name *</label><input type="text" class="form-control" id="progName" placeholder="e.g. Diploma in Nursing"/></div>
+        <div class="form-group"><label class="form-label">Type *</label><select class="form-control" id="progType"><option value="diploma">Diploma</option><option value="certificate">Certificate</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Field *</label><input type="text" class="form-control" id="progField" placeholder="e.g. Nursing"/></div>
+        <div class="form-group"><label class="form-label">Duration *</label><input type="text" class="form-control" id="progDuration" placeholder="e.g. 3 Years"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Fee Per Semester (UGX) *</label><input type="number" class="form-control" id="progFee" placeholder="850000"/></div>
+        <div class="form-group"><label class="form-label">Intake Months</label><input type="text" class="form-control" id="progIntake" placeholder="January, July"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Entry Requirements</label><textarea class="form-control" id="progReq" placeholder="UCE with credits in..."></textarea></div>
+      <div class="form-group"><label class="form-label">Career Outcomes</label><textarea class="form-control" id="progCareer" placeholder="Graduates can work as..."></textarea></div>
+      <div class="form-group"><label class="form-label">Description</label><textarea class="form-control" id="progDesc" placeholder="Programme overview..."></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('progModal')">Cancel</button><button class="btn btn-gold" onclick="saveProgram()">Save Programme</button></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/admin.js"></script>
+<script>
+  ADMIN.init();
+  function goto(page) { window.location.href = page; }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  let allPrograms = [];
+
+  async function loadPrograms() {
+    const type = document.getElementById('typeFilter').value;
+    let url = '/programs';
+    if (type) url += `?type=${type}`;
+    const tbody = document.getElementById('programsTable');
+    tbody.innerHTML = '<tr><td colspan="7"><div class="loader"><div class="spinner"></div></div></td></tr>';
+    try {
+      const data = await ADMIN.get(url);
+      allPrograms = data.data || [];
+      renderPrograms(allPrograms);
+    } catch { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--danger)">Failed to load</td></tr>'; }
+  }
+
+  function renderPrograms(programs) {
+    const tbody = document.getElementById('programsTable');
+    if (!programs.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📚</div><h3>No Programmes</h3><p>Create your first programme.</p></div></td></tr>'; return; }
+    tbody.innerHTML = programs.map(p => `
+      <tr>
+        <td><strong>${p.name}</strong></td>
+        <td><span class="badge badge-navy">${p.type}</span></td>
+        <td style="font-size:13px">${p.field}</td>
+        <td style="font-size:13px">${p.duration}</td>
+        <td><strong style="color:var(--navy)">UGX ${Number(p.fee_per_semester).toLocaleString()}</strong></td>
+        <td>${p.is_active ? '<span class="badge badge-approved">Active</span>' : '<span class="badge badge-rejected">Inactive</span>'}</td>
+        <td>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-outline btn-sm" onclick='editProgram(${JSON.stringify(p)})'>Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteProgram(${p.id})">Delete</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  function filterPrograms() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    renderPrograms(!q ? allPrograms : allPrograms.filter(p => p.name?.toLowerCase().includes(q)));
+  }
+
+  function openCreate() {
+    document.getElementById('editId').value = '';
+    ['progName','progField','progDuration','progFee','progIntake','progReq','progCareer','progDesc'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('progType').value = 'diploma';
+    document.getElementById('progModalTitle').textContent = 'New Programme';
+    document.getElementById('progModal').classList.add('open');
+  }
+
+  function editProgram(p) {
+    document.getElementById('editId').value = p.id;
+    document.getElementById('progName').value = p.name;
+    document.getElementById('progType').value = p.type;
+    document.getElementById('progField').value = p.field;
+    document.getElementById('progDuration').value = p.duration;
+    document.getElementById('progFee').value = p.fee_per_semester;
+    document.getElementById('progIntake').value = p.intake_months || '';
+    document.getElementById('progReq').value = p.entry_requirements || '';
+    document.getElementById('progCareer').value = p.career_outcomes || '';
+    document.getElementById('progDesc').value = p.description || '';
+    document.getElementById('progModalTitle').textContent = 'Edit Programme';
+    document.getElementById('progModal').classList.add('open');
+  }
+
+  async function saveProgram() {
+    const id = document.getElementById('editId').value;
+    const payload = {
+      name: document.getElementById('progName').value.trim(),
+      type: document.getElementById('progType').value,
+      field: document.getElementById('progField').value.trim(),
+      duration: document.getElementById('progDuration').value.trim(),
+      fee_per_semester: Number(document.getElementById('progFee').value),
+      intake_months: document.getElementById('progIntake').value.trim(),
+      entry_requirements: document.getElementById('progReq').value.trim(),
+      career_outcomes: document.getElementById('progCareer').value.trim(),
+      description: document.getElementById('progDesc').value.trim()
+    };
+    if (!payload.name || !payload.fee_per_semester) { ADMIN.toast('Name and fee are required', 'error'); return; }
+    const data = id ? await ADMIN.put(`/programs/${id}`, payload) : await ADMIN.post('/programs', payload);
+    if (data.success) { ADMIN.toast(id ? 'Programme updated!' : 'Programme created!', 'success'); closeModal('progModal'); loadPrograms(); }
+    else ADMIN.toast(data.message || 'Failed to save', 'error');
+  }
+
+  async function deleteProgram(id) {
+    if (!ADMIN.confirm('Remove this programme? It will be hidden from the website.')) return;
+    const data = await ADMIN.delete(`/programs/${id}`);
+    if (data.success) { ADMIN.toast('Programme removed', 'success'); loadPrograms(); }
+    else ADMIN.toast(data.message || 'Failed', 'error');
+  }
+
+  loadPrograms();
+</script>
+</body>
+</html>

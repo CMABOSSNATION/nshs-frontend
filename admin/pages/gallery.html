@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gallery — NSHS Admin</title>
+  <link rel="stylesheet" href="../css/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><span class="sidebar-logo-fallback" style="display:none">N</span></div>
+      <div><div class="sidebar-title">NSHS Admin</div><div class="sidebar-subtitle">To Serve & Care</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main</div>
+      <div class="nav-item " onclick="goto('dashboard.html')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-section-title">Admissions</div>
+      <div class="nav-item " onclick="goto('applications.html')"><span class="nav-icon">📝</span> Applications</div>
+      <div class="nav-item " onclick="goto('students.html')"><span class="nav-icon">🎓</span> Students</div>
+      <div class="nav-section-title">Academic</div>
+      <div class="nav-item " onclick="goto('programs.html')"><span class="nav-icon">📚</span> Programmes</div>
+      <div class="nav-item " onclick="goto('courses.html')"><span class="nav-icon">📖</span> Courses</div>
+      <div class="nav-item " onclick="goto('results.html')"><span class="nav-icon">📋</span> Results</div>
+      <div class="nav-item " onclick="goto('timetables.html')"><span class="nav-icon">🗓️</span> Timetables</div>
+      <div class="nav-section-title">Finance</div>
+      <div class="nav-item " onclick="goto('fees.html')"><span class="nav-icon">💰</span> Fees & Payments</div>
+      <div class="nav-section-title">Content</div>
+      <div class="nav-item " onclick="goto('news.html')"><span class="nav-icon">📰</span> News & Events</div>
+      <div class="nav-item active" onclick="goto('gallery.html')"><span class="nav-icon">🖼️</span> Gallery</div>
+      <div class="nav-item " onclick="goto('certificates.html')"><span class="nav-icon">🏅</span> Certificates</div>
+      <div class="nav-section-title">System</div>
+      <div class="nav-item " onclick="goto('staff.html')"><span class="nav-icon">👥</span> Staff Users</div>
+      <div class="nav-item " onclick="goto('notifications.html')"><span class="nav-icon">📢</span> Broadcast SMS</div>
+      <div class="nav-item " onclick="goto('reports.html')"><span class="nav-icon">📈</span> Reports</div>
+      <div class="nav-item " onclick="goto('audit.html')"><span class="nav-icon">🔒</span> Audit Logs</div>
+      <div class="nav-item " onclick="goto('contact.html')"><span class="nav-icon">✉️</span> Messages</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar user-initial">A</div>
+        <div><div class="sidebar-user-name user-name">Admin</div><div class="sidebar-user-role user-role">admin</div></div>
+        <span class="sidebar-logout" onclick="ADMIN.logout()">🚪</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <button class="topbar-menu-btn" id="sidebarToggle">☰</button>
+      <div class="topbar-title">Gallery</div>
+      <div class="topbar-right">
+        
+        <div class="topbar-user"><div class="topbar-user-avatar user-initial">A</div><span class="topbar-user-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="page-header-row">
+        <div class="page-header"><h1>Gallery</h1><p>Upload and manage photo gallery.</p></div>
+        <button class="btn btn-gold" onclick="openUpload()">+ Upload Photos</button>
+      </div>
+
+      <div class="filter-bar">
+        <select class="filter-select" id="categoryFilter" onchange="loadGallery()">
+          <option value="">All Categories</option>
+          <option value="Campus">Campus</option>
+          <option value="Graduation">Graduation</option>
+          <option value="Clinical Training">Clinical Training</option>
+          <option value="Events">Events</option>
+        </select>
+      </div>
+
+      <div id="galleryGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px">
+        <div class="loader"><div class="spinner"></div> Loading...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="uploadModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Upload Photos</span><button class="modal-close" onclick="closeModal('uploadModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Category</label>
+        <select class="form-control" id="uploadCategory">
+          <option value="Campus">Campus</option><option value="Graduation">Graduation</option>
+          <option value="Clinical Training">Clinical Training</option><option value="Events">Events</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Caption</label><input type="text" class="form-control" id="uploadCaption" placeholder="Optional caption"/></div>
+      <div class="form-group">
+        <label class="form-label">Photos *</label>
+        <input type="file" class="form-control" id="uploadFiles" accept="image/*" multiple/>
+        <div class="form-hint">Select multiple photos. Max 5MB each.</div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('uploadModal')">Cancel</button><button class="btn btn-gold" onclick="uploadPhotos()">Upload</button></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/admin.js"></script>
+<script>
+  ADMIN.init();
+  function goto(page) { window.location.href = page; }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  async function loadGallery() {
+    const category = document.getElementById('categoryFilter').value;
+    let url = '/gallery';
+    if (category) url += `?category=${encodeURIComponent(category)}`;
+    const grid = document.getElementById('galleryGrid');
+    grid.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+    try {
+      const data = await ADMIN.get(url);
+      const rows = data.data || [];
+      if (!rows.length) { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🖼️</div><h3>No Photos Yet</h3><p>Upload your first photos.</p></div>'; return; }
+      grid.innerHTML = rows.map(g => `
+        <div style="position:relative;border-radius:var(--radius);overflow:hidden;aspect-ratio:1;background:var(--gray-100);box-shadow:var(--shadow-sm)">
+          <img src="${g.image_url}" style="width:100%;height:100%;object-fit:cover"/>
+          <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,0.7),transparent);padding:10px;color:white;font-size:11px">${g.category || ''}</div>
+        </div>`).join('');
+    } catch { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><p style="color:var(--danger)">Failed to load gallery</p></div>'; }
+  }
+
+  function openUpload() {
+    document.getElementById('uploadFiles').value = '';
+    document.getElementById('uploadCaption').value = '';
+    document.getElementById('uploadModal').classList.add('open');
+  }
+
+  async function uploadPhotos() {
+    const files = document.getElementById('uploadFiles').files;
+    const category = document.getElementById('uploadCategory').value;
+    const caption  = document.getElementById('uploadCaption').value;
+    if (!files.length) { ADMIN.toast('Please select photos to upload', 'error'); return; }
+    const form = new FormData();
+    for (const f of files) form.append('images', f);
+    form.append('category', category);
+    form.append('caption', caption);
+    const data = await ADMIN.postForm('/gallery', form);
+    if (data.success) { ADMIN.toast(data.message, 'success'); closeModal('uploadModal'); loadGallery(); }
+    else ADMIN.toast(data.message || 'Upload failed', 'error');
+  }
+
+  loadGallery();
+</script>
+</body>
+</html>

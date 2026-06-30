@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Results — NSHS Admin</title>
+  <link rel="stylesheet" href="../css/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><span class="sidebar-logo-fallback" style="display:none">N</span></div>
+      <div><div class="sidebar-title">NSHS Admin</div><div class="sidebar-subtitle">To Serve & Care</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main</div>
+      <div class="nav-item" onclick="goto('dashboard.html')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-section-title">Admissions</div>
+      <div class="nav-item" onclick="goto('applications.html')"><span class="nav-icon">📝</span> Applications</div>
+      <div class="nav-item" onclick="goto('students.html')"><span class="nav-icon">🎓</span> Students</div>
+      <div class="nav-section-title">Academic</div>
+      <div class="nav-item" onclick="goto('programs.html')"><span class="nav-icon">📚</span> Programmes</div>
+      <div class="nav-item" onclick="goto('courses.html')"><span class="nav-icon">📖</span> Courses</div>
+      <div class="nav-item active" onclick="goto('results.html')"><span class="nav-icon">📋</span> Results</div>
+      <div class="nav-item" onclick="goto('timetables.html')"><span class="nav-icon">🗓️</span> Timetables</div>
+      <div class="nav-section-title">Finance</div>
+      <div class="nav-item" onclick="goto('fees.html')"><span class="nav-icon">💰</span> Fees & Payments</div>
+      <div class="nav-section-title">Content</div>
+      <div class="nav-item" onclick="goto('news.html')"><span class="nav-icon">📰</span> News & Events</div>
+      <div class="nav-item" onclick="goto('gallery.html')"><span class="nav-icon">🖼️</span> Gallery</div>
+      <div class="nav-item" onclick="goto('certificates.html')"><span class="nav-icon">🏅</span> Certificates</div>
+      <div class="nav-section-title">System</div>
+      <div class="nav-item" onclick="goto('staff.html')"><span class="nav-icon">👥</span> Staff Users</div>
+      <div class="nav-item" onclick="goto('notifications.html')"><span class="nav-icon">📢</span> Broadcast SMS</div>
+      <div class="nav-item" onclick="goto('reports.html')"><span class="nav-icon">📈</span> Reports</div>
+      <div class="nav-item" onclick="goto('audit.html')"><span class="nav-icon">🔒</span> Audit Logs</div>
+      <div class="nav-item" onclick="goto('contact.html')"><span class="nav-icon">✉️</span> Messages</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar user-initial">A</div>
+        <div><div class="sidebar-user-name user-name">Admin</div><div class="sidebar-user-role user-role">admin</div></div>
+        <span class="sidebar-logout" onclick="ADMIN.logout()">🚪</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <button class="topbar-menu-btn" id="sidebarToggle">☰</button>
+      <div class="topbar-title">Results</div>
+      <div class="topbar-right">
+        <div class="topbar-user"><div class="topbar-user-avatar user-initial">A</div><span class="topbar-user-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="page-header"><h1>Exam Results</h1><p>Upload, manage and publish student results.</p></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+
+        <!-- Upload Results -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Upload Results</span></div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Programme *</label>
+                <select class="form-control" id="uploadProgram" onchange="loadStudentsForResults()"><option value="">Select Programme</option></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Course *</label>
+                <select class="form-control" id="uploadCourse"><option value="">Select Course</option></select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Semester *</label>
+                <select class="form-control" id="uploadSemester">
+                  <option value="Semester 1">Semester 1</option>
+                  <option value="Semester 2">Semester 2</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Academic Year *</label>
+                <select class="form-control" id="uploadYear">
+                  <option value="2025/2026">2025/2026</option>
+                  <option value="2024/2025">2024/2025</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="resultsEntryTable" style="display:none">
+              <div style="font-family:var(--font-heading);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gray-500);margin-bottom:12px">Enter Marks (0-100)</div>
+              <div id="studentResultRows"></div>
+              <button class="btn btn-gold" style="margin-top:16px;width:100%;justify-content:center" onclick="submitResults()">Upload Results →</button>
+            </div>
+
+            <button class="btn btn-navy" onclick="loadStudentsForResults()" id="loadStudentsBtn">Load Students →</button>
+          </div>
+        </div>
+
+        <!-- Publish Results -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Publish Results</span></div>
+          <div class="card-body">
+            <p style="font-size:14px;color:var(--gray-500);margin-bottom:20px">Publishing results makes them visible to students in the portal and sends SMS/email notifications.</p>
+            <div class="form-group">
+              <label class="form-label">Semester *</label>
+              <select class="form-control" id="pubSemester">
+                <option value="Semester 1">Semester 1</option>
+                <option value="Semester 2">Semester 2</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Academic Year *</label>
+              <select class="form-control" id="pubYear">
+                <option value="2025/2026">2025/2026</option>
+                <option value="2024/2025">2024/2025</option>
+              </select>
+            </div>
+            <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);padding:14px;border-radius:var(--radius);margin-bottom:20px">
+              <strong style="color:var(--warning)">⚠️ Warning:</strong>
+              <p style="font-size:13px;margin-top:4px">This will notify all affected students via SMS and email. Make sure all results are correct before publishing.</p>
+            </div>
+            <button class="btn btn-gold" style="width:100%;justify-content:center" onclick="publishResults()">📢 Publish Results & Notify Students</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- View Results -->
+      <div class="card" style="margin-top:24px">
+        <div class="card-header">
+          <span class="card-title">View Results</span>
+          <div style="display:flex;gap:10px">
+            <select class="filter-select" id="viewSemester" onchange="loadResults()">
+              <option value="">All Semesters</option>
+              <option value="Semester 1">Semester 1</option>
+              <option value="Semester 2">Semester 2</option>
+            </select>
+            <select class="filter-select" id="viewYear" onchange="loadResults()">
+              <option value="">All Years</option>
+              <option value="2025/2026">2025/2026</option>
+              <option value="2024/2025">2024/2025</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Student</th><th>Student No</th><th>Course</th><th>Marks</th><th>Grade</th><th>Semester</th><th>Status</th></tr></thead>
+            <tbody id="resultsTable"><tr><td colspan="7"><div class="loader"><div class="spinner"></div> Loading...</div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/admin.js"></script>
+<script>
+  ADMIN.init();
+  function goto(page) { window.location.href = page; }
+  let studentsForResults = [];
+
+  function getGrade(marks) {
+    if (marks >= 80) return 'A';
+    if (marks >= 70) return 'B';
+    if (marks >= 60) return 'C';
+    if (marks >= 50) return 'D';
+    return 'F';
+  }
+
+  async function loadPrograms() {
+    const data = await ADMIN.get('/programs');
+    if (data.success) {
+      const sel = document.getElementById('uploadProgram');
+      data.data.forEach(p => { const o = document.createElement('option'); o.value = p.id; o.textContent = p.name; sel.appendChild(o); });
+    }
+  }
+
+  async function loadStudentsForResults() {
+    const programId = document.getElementById('uploadProgram').value;
+    if (!programId) { ADMIN.toast('Please select a programme first', 'error'); return; }
+
+    // Load courses for this program
+    const courseData = await ADMIN.get(`/courses?program_id=${programId}`);
+    const courseSel = document.getElementById('uploadCourse');
+    courseSel.innerHTML = '<option value="">Select Course</option>';
+    if (courseData.success) {
+      courseData.data.forEach(c => { const o = document.createElement('option'); o.value = c.id; o.textContent = `${c.code} - ${c.name}`; courseSel.appendChild(o); });
+    }
+
+    // Load students
+    const studData = await ADMIN.get(`/students?program_id=${programId}&status=active&limit=100`);
+    studentsForResults = studData.data || [];
+
+    if (!studentsForResults.length) { ADMIN.toast('No active students in this programme', 'warning'); return; }
+
+    const container = document.getElementById('studentResultRows');
+    container.innerHTML = studentsForResults.map(s => `
+      <div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;margin-bottom:10px;padding:10px;background:var(--gray-50);border-radius:var(--radius)">
+        <div><strong style="font-size:13px">${s.full_name}</strong><br><small style="color:var(--gray-400)">${s.student_number}</small></div>
+        <input type="number" min="0" max="100" class="form-control" id="marks_${s.id}" placeholder="Marks" style="width:90px" oninput="autoGrade(${s.id})"/>
+        <input type="text" class="form-control" id="grade_${s.id}" placeholder="Grade" style="width:60px" readonly/>
+      </div>`).join('');
+
+    document.getElementById('resultsEntryTable').style.display = 'block';
+    document.getElementById('loadStudentsBtn').style.display = 'none';
+  }
+
+  function autoGrade(studentId) {
+    const marks = parseInt(document.getElementById(`marks_${studentId}`).value);
+    if (!isNaN(marks)) document.getElementById(`grade_${studentId}`).value = getGrade(marks);
+  }
+
+  async function submitResults() {
+    const course_id    = document.getElementById('uploadCourse').value;
+    const semester     = document.getElementById('uploadSemester').value;
+    const academic_year = document.getElementById('uploadYear').value;
+
+    if (!course_id) { ADMIN.toast('Please select a course', 'error'); return; }
+
+    const results = studentsForResults.map(s => ({
+      student_id: s.id,
+      course_id:  parseInt(course_id),
+      marks:      parseFloat(document.getElementById(`marks_${s.id}`).value) || 0,
+      grade:      document.getElementById(`grade_${s.id}`).value || 'F',
+      remarks:    '',
+      semester,
+      academic_year
+    })).filter(r => document.getElementById(`marks_${r.student_id}`)?.value);
+
+    if (!results.length) { ADMIN.toast('Please enter at least one mark', 'error'); return; }
+
+    const data = await ADMIN.post('/results', { results });
+    if (data.success) {
+      ADMIN.toast(`${results.length} results uploaded successfully!`, 'success');
+      loadResults();
+    } else {
+      ADMIN.toast(data.message || 'Failed to upload results', 'error');
+    }
+  }
+
+  async function publishResults() {
+    const semester     = document.getElementById('pubSemester').value;
+    const academic_year = document.getElementById('pubYear').value;
+    if (!ADMIN.confirm(`Publish results for ${semester} ${academic_year}? Students will be notified by SMS and email.`)) return;
+
+    const data = await ADMIN.post('/results/publish', { semester, academic_year });
+    if (data.success) ADMIN.toast(data.message, 'success');
+    else ADMIN.toast(data.message || 'Failed to publish', 'error');
+  }
+
+  async function loadResults() {
+    const semester = document.getElementById('viewSemester').value;
+    const year     = document.getElementById('viewYear').value;
+    let url = '/results?';
+    if (semester) url += `semester=${encodeURIComponent(semester)}&`;
+    if (year)     url += `academic_year=${encodeURIComponent(year)}`;
+
+    const tbody = document.getElementById('resultsTable');
+    tbody.innerHTML = '<tr><td colspan="7"><div class="loader"><div class="spinner"></div></div></td></tr>';
+    try {
+      const data = await ADMIN.get(url);
+      const rows = data.data || [];
+      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state" style="padding:24px"><div class="empty-icon">📋</div><p>No results found</p></div></td></tr>'; return; }
+      tbody.innerHTML = rows.map(r => `
+        <tr>
+          <td>${r.full_name}</td>
+          <td style="font-family:var(--font-heading);color:var(--navy)">${r.student_number}</td>
+          <td style="font-size:13px">${r.course}</td>
+          <td><strong>${r.marks}</strong>/100</td>
+          <td><span class="badge ${r.grade==='F'?'badge-rejected':'badge-approved'}">${r.grade}</span></td>
+          <td style="font-size:13px">${r.semester}</td>
+          <td>${r.is_published ? '<span class="badge badge-approved">Published</span>' : '<span class="badge badge-navy">Draft</span>'}</td>
+        </tr>`).join('');
+    } catch {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--danger)">Failed to load</td></tr>';
+    }
+  }
+
+  loadPrograms();
+  loadResults();
+</script>
+</body>
+</html>

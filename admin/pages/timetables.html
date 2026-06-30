@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Timetables — NSHS Admin</title>
+  <link rel="stylesheet" href="../css/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><span class="sidebar-logo-fallback" style="display:none">N</span></div>
+      <div><div class="sidebar-title">NSHS Admin</div><div class="sidebar-subtitle">To Serve & Care</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main</div>
+      <div class="nav-item " onclick="goto('dashboard.html')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-section-title">Admissions</div>
+      <div class="nav-item " onclick="goto('applications.html')"><span class="nav-icon">📝</span> Applications</div>
+      <div class="nav-item " onclick="goto('students.html')"><span class="nav-icon">🎓</span> Students</div>
+      <div class="nav-section-title">Academic</div>
+      <div class="nav-item " onclick="goto('programs.html')"><span class="nav-icon">📚</span> Programmes</div>
+      <div class="nav-item " onclick="goto('courses.html')"><span class="nav-icon">📖</span> Courses</div>
+      <div class="nav-item " onclick="goto('results.html')"><span class="nav-icon">📋</span> Results</div>
+      <div class="nav-item active" onclick="goto('timetables.html')"><span class="nav-icon">🗓️</span> Timetables</div>
+      <div class="nav-section-title">Finance</div>
+      <div class="nav-item " onclick="goto('fees.html')"><span class="nav-icon">💰</span> Fees & Payments</div>
+      <div class="nav-section-title">Content</div>
+      <div class="nav-item " onclick="goto('news.html')"><span class="nav-icon">📰</span> News & Events</div>
+      <div class="nav-item " onclick="goto('gallery.html')"><span class="nav-icon">🖼️</span> Gallery</div>
+      <div class="nav-item " onclick="goto('certificates.html')"><span class="nav-icon">🏅</span> Certificates</div>
+      <div class="nav-section-title">System</div>
+      <div class="nav-item " onclick="goto('staff.html')"><span class="nav-icon">👥</span> Staff Users</div>
+      <div class="nav-item " onclick="goto('notifications.html')"><span class="nav-icon">📢</span> Broadcast SMS</div>
+      <div class="nav-item " onclick="goto('reports.html')"><span class="nav-icon">📈</span> Reports</div>
+      <div class="nav-item " onclick="goto('audit.html')"><span class="nav-icon">🔒</span> Audit Logs</div>
+      <div class="nav-item " onclick="goto('contact.html')"><span class="nav-icon">✉️</span> Messages</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar user-initial">A</div>
+        <div><div class="sidebar-user-name user-name">Admin</div><div class="sidebar-user-role user-role">admin</div></div>
+        <span class="sidebar-logout" onclick="ADMIN.logout()">🚪</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <button class="topbar-menu-btn" id="sidebarToggle">☰</button>
+      <div class="topbar-title">Timetables</div>
+      <div class="topbar-right">
+        
+        <div class="topbar-user"><div class="topbar-user-avatar user-initial">A</div><span class="topbar-user-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="page-header-row">
+        <div class="page-header"><h1>Timetables</h1><p>Manage class schedules per programme.</p></div>
+        <button class="btn btn-gold" onclick="openCreate()">+ Add Entry</button>
+      </div>
+
+      <div class="filter-bar">
+        <select class="filter-select" id="programFilter" onchange="loadTimetables()"><option value="">Select Programme</option></select>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Day</th><th>Time</th><th>Course</th><th>Room</th><th>Semester</th><th>Actions</th></tr></thead>
+            <tbody id="ttTable"><tr><td colspan="6"><div class="empty-state" style="padding:24px"><p>Select a programme to view timetable</p></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="ttModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Add Timetable Entry</span><button class="modal-close" onclick="closeModal('ttModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Programme *</label><select class="form-control" id="ttProgram"><option value="">Select Programme</option></select></div>
+      <div class="form-group"><label class="form-label">Course *</label><select class="form-control" id="ttCourse"><option value="">Select Course</option></select></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Day *</label>
+          <select class="form-control" id="ttDay">
+            <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+            <option>Thursday</option><option>Friday</option><option>Saturday</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Room</label><input type="text" class="form-control" id="ttRoom" placeholder="e.g. Room 1"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Start Time *</label><input type="time" class="form-control" id="ttStart"/></div>
+        <div class="form-group"><label class="form-label">End Time *</label><input type="time" class="form-control" id="ttEnd"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Semester *</label><select class="form-control" id="ttSemester"><option value="Semester 1">Semester 1</option><option value="Semester 2">Semester 2</option></select></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('ttModal')">Cancel</button><button class="btn btn-gold" onclick="saveTT()">Save Entry</button></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/admin.js"></script>
+<script>
+  ADMIN.init();
+  function goto(page) { window.location.href = page; }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  async function loadPrograms() {
+    const data = await ADMIN.get('/programs');
+    if (data.success) {
+      [document.getElementById('programFilter'), document.getElementById('ttProgram')].forEach(sel => {
+        data.data.forEach(p => { const o = document.createElement('option'); o.value = p.id; o.textContent = p.name; sel.appendChild(o.cloneNode(true)); });
+      });
+    }
+  }
+
+  document.getElementById('ttProgram')?.addEventListener('change', async function() {
+    const data = await ADMIN.get(`/courses?program_id=${this.value}`);
+    const sel = document.getElementById('ttCourse');
+    sel.innerHTML = '<option value="">Select Course</option>';
+    if (data.success) data.data.forEach(c => { const o = document.createElement('option'); o.value = c.id; o.textContent = `${c.code} - ${c.name}`; sel.appendChild(o); });
+  });
+
+  async function loadTimetables() {
+    const programId = document.getElementById('programFilter').value;
+    const tbody = document.getElementById('ttTable');
+    if (!programId) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state" style="padding:24px"><p>Select a programme to view timetable</p></div></td></tr>'; return; }
+    tbody.innerHTML = '<tr><td colspan="6"><div class="loader"><div class="spinner"></div></div></td></tr>';
+    try {
+      const data = await ADMIN.get(`/timetables?program_id=${programId}`);
+      const rows = data.data || [];
+      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state" style="padding:24px"><div class="empty-icon">🗓️</div><p>No timetable entries yet</p></div></td></tr>'; return; }
+      tbody.innerHTML = rows.map(t => `
+        <tr>
+          <td><span class="badge badge-navy">${t.day}</span></td>
+          <td style="font-size:13px">${t.start_time?.substring(0,5)} - ${t.end_time?.substring(0,5)}</td>
+          <td>${t.course_name} <small style="color:var(--gray-400)">(${t.course_code})</small></td>
+          <td style="font-size:13px">${t.room || '—'}</td>
+          <td style="font-size:13px">${t.semester}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deleteTT(${t.id})">Delete</button></td>
+        </tr>`).join('');
+    } catch { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--danger)">Failed to load</td></tr>'; }
+  }
+
+  function openCreate() {
+    document.getElementById('ttModal').classList.add('open');
+  }
+
+  async function saveTT() {
+    const payload = {
+      program_id: document.getElementById('ttProgram').value,
+      course_id: document.getElementById('ttCourse').value,
+      day: document.getElementById('ttDay').value,
+      start_time: document.getElementById('ttStart').value,
+      end_time: document.getElementById('ttEnd').value,
+      room: document.getElementById('ttRoom').value,
+      semester: document.getElementById('ttSemester').value
+    };
+    if (!payload.program_id || !payload.course_id || !payload.start_time || !payload.end_time) {
+      ADMIN.toast('Please fill all required fields', 'error'); return;
+    }
+    const data = await ADMIN.post('/timetables', payload);
+    if (data.success) { ADMIN.toast('Timetable entry added!', 'success'); closeModal('ttModal'); document.getElementById('programFilter').value = payload.program_id; loadTimetables(); }
+    else ADMIN.toast(data.message || 'Failed to save', 'error');
+  }
+
+  async function deleteTT(id) {
+    if (!ADMIN.confirm('Remove this timetable entry?')) return;
+    const data = await ADMIN.delete(`/timetables/${id}`);
+    if (data.success) { ADMIN.toast('Entry removed', 'success'); loadTimetables(); }
+    else ADMIN.toast('Failed', 'error');
+  }
+
+  loadPrograms();
+</script>
+</body>
+</html>

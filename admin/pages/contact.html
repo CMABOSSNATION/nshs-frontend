@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact Messages — NSHS Admin</title>
+  <link rel="stylesheet" href="../css/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><span class="sidebar-logo-fallback" style="display:none">N</span></div>
+      <div><div class="sidebar-title">NSHS Admin</div><div class="sidebar-subtitle">To Serve & Care</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main</div>
+      <div class="nav-item " onclick="goto('dashboard.html')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-section-title">Admissions</div>
+      <div class="nav-item " onclick="goto('applications.html')"><span class="nav-icon">📝</span> Applications</div>
+      <div class="nav-item " onclick="goto('students.html')"><span class="nav-icon">🎓</span> Students</div>
+      <div class="nav-section-title">Academic</div>
+      <div class="nav-item " onclick="goto('programs.html')"><span class="nav-icon">📚</span> Programmes</div>
+      <div class="nav-item " onclick="goto('courses.html')"><span class="nav-icon">📖</span> Courses</div>
+      <div class="nav-item " onclick="goto('results.html')"><span class="nav-icon">📋</span> Results</div>
+      <div class="nav-item " onclick="goto('timetables.html')"><span class="nav-icon">🗓️</span> Timetables</div>
+      <div class="nav-section-title">Finance</div>
+      <div class="nav-item " onclick="goto('fees.html')"><span class="nav-icon">💰</span> Fees & Payments</div>
+      <div class="nav-section-title">Content</div>
+      <div class="nav-item " onclick="goto('news.html')"><span class="nav-icon">📰</span> News & Events</div>
+      <div class="nav-item " onclick="goto('gallery.html')"><span class="nav-icon">🖼️</span> Gallery</div>
+      <div class="nav-item " onclick="goto('certificates.html')"><span class="nav-icon">🏅</span> Certificates</div>
+      <div class="nav-section-title">System</div>
+      <div class="nav-item " onclick="goto('staff.html')"><span class="nav-icon">👥</span> Staff Users</div>
+      <div class="nav-item " onclick="goto('notifications.html')"><span class="nav-icon">📢</span> Broadcast SMS</div>
+      <div class="nav-item " onclick="goto('reports.html')"><span class="nav-icon">📈</span> Reports</div>
+      <div class="nav-item " onclick="goto('audit.html')"><span class="nav-icon">🔒</span> Audit Logs</div>
+      <div class="nav-item active" onclick="goto('contact.html')"><span class="nav-icon">✉️</span> Messages</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar user-initial">A</div>
+        <div><div class="sidebar-user-name user-name">Admin</div><div class="sidebar-user-role user-role">admin</div></div>
+        <span class="sidebar-logout" onclick="ADMIN.logout()">🚪</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <button class="topbar-menu-btn" id="sidebarToggle">☰</button>
+      <div class="topbar-title">Contact Messages</div>
+      <div class="topbar-right">
+        
+        <div class="topbar-user"><div class="topbar-user-avatar user-initial">A</div><span class="topbar-user-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="page-header"><h1>Contact Messages</h1><p>Messages submitted via the website contact form.</p></div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Contact</th><th>Subject</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="contactTable"><tr><td colspan="5"><div class="loader"><div class="spinner"></div> Loading...</div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="msgModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Message Details</span><button class="modal-close" onclick="closeModal('msgModal')">✕</button></div>
+    <div class="modal-body" id="msgModalBody"></div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('msgModal')">Close</button></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/admin.js"></script>
+<script>
+  ADMIN.init();
+  function goto(page) { window.location.href = page; }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  async function loadMessages() {
+    const tbody = document.getElementById('contactTable');
+    tbody.innerHTML = '<tr><td colspan="5"><div class="loader"><div class="spinner"></div></div></td></tr>';
+    try {
+      const data = await ADMIN.get('/contact');
+      const rows = data.data || [];
+      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">✉️</div><h3>No Messages Yet</h3></div></td></tr>'; return; }
+      tbody.innerHTML = rows.map(m => `
+        <tr>
+          <td><strong>${m.name}</strong></td>
+          <td style="font-size:13px">${m.phone || ''}<br><small style="color:var(--gray-400)">${m.email || ''}</small></td>
+          <td style="font-size:13px">${m.subject}</td>
+          <td style="font-size:12px;color:var(--gray-400)">${ADMIN.formatDate(m.created_at)}</td>
+          <td><button class="btn btn-outline btn-sm" onclick='viewMsg(${JSON.stringify(m)})'>View</button></td>
+        </tr>`).join('');
+    } catch { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--danger)">Failed to load</td></tr>'; }
+  }
+
+  function viewMsg(m) {
+    document.getElementById('msgModalBody').innerHTML = `
+      <div style="margin-bottom:16px"><div class="form-label">From</div><strong>${m.name}</strong></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <div><div class="form-label">Phone</div>${m.phone || '—'}</div>
+        <div><div class="form-label">Email</div>${m.email || '—'}</div>
+      </div>
+      <div style="margin-bottom:16px"><div class="form-label">Subject</div>${m.subject}</div>
+      <div><div class="form-label">Message</div><p style="font-size:14px;line-height:1.7;margin-top:6px;padding:14px;background:var(--gray-50);border-radius:var(--radius)">${m.message}</p></div>
+      ${m.phone ? `<a href="https://wa.me/256${m.phone.replace(/^0/,'')}" target="_blank" class="btn btn-success" style="margin-top:16px">💬 Reply on WhatsApp</a>` : ''}`;
+    document.getElementById('msgModal').classList.add('open');
+  }
+
+  loadMessages();
+</script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Applications — NSHS Admin</title>
+<link rel="stylesheet" href="../css/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- Sidebar -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+        <span class="sidebar-logo-fallback" style="display:none">N</span>
+      </div>
+      <div><div class="sidebar-title">NSHS Admin</div><div class="sidebar-subtitle">To Serve & Care</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main</div>
+      <div class="nav-item" onclick="goto('dashboard.html')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-section-title">Admissions</div>
+      <div class="nav-item active" onclick="goto('applications.html')"><span class="nav-icon">📝</span> Applications</div>
+      <div class="nav-item" onclick="goto('students.html')"><span class="nav-icon">🎓</span> Students</div>
+      <div class="nav-section-title">Academic</div>
+      <div class="nav-item" onclick="goto('programs.html')"><span class="nav-icon">📚</span> Programmes</div>
+      <div class="nav-item" onclick="goto('courses.html')"><span class="nav-icon">📖</span> Courses</div>
+      <div class="nav-item" onclick="goto('results.html')"><span class="nav-icon">📋</span> Results</div>
+      <div class="nav-item" onclick="goto('timetables.html')"><span class="nav-icon">🗓️</span> Timetables</div>
+      <div class="nav-section-title">Finance</div>
+      <div class="nav-item" onclick="goto('fees.html')"><span class="nav-icon">💰</span> Fees & Payments</div>
+      <div class="nav-section-title">Content</div>
+      <div class="nav-item" onclick="goto('news.html')"><span class="nav-icon">📰</span> News & Events</div>
+      <div class="nav-item" onclick="goto('gallery.html')"><span class="nav-icon">🖼️</span> Gallery</div>
+      <div class="nav-item" onclick="goto('certificates.html')"><span class="nav-icon">🏅</span> Certificates</div>
+      <div class="nav-section-title">System</div>
+      <div class="nav-item" onclick="goto('staff.html')"><span class="nav-icon">👥</span> Staff Users</div>
+      <div class="nav-item" onclick="goto('notifications.html')"><span class="nav-icon">📢</span> Broadcast SMS</div>
+      <div class="nav-item" onclick="goto('reports.html')"><span class="nav-icon">📈</span> Reports</div>
+      <div class="nav-item" onclick="goto('audit.html')"><span class="nav-icon">🔒</span> Audit Logs</div>
+      <div class="nav-item" onclick="goto('contact.html')"><span class="nav-icon">✉️</span> Messages</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar user-initial">A</div>
+        <div><div class="sidebar-user-name user-name">Admin</div><div class="sidebar-user-role user-role">admin</div></div>
+        <span class="sidebar-logout" onclick="ADMIN.logout()">🚪</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+    <div class="topbar">
+      <button class="topbar-menu-btn" id="sidebarToggle">☰</button>
+      <div class="topbar-title">Applications</div>
+      <div class="topbar-right">
+        <div class="topbar-user">
+          <div class="topbar-user-avatar user-initial">A</div>
+          <span class="topbar-user-name user-name">Admin</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="page-header-row">
+        <div class="page-header">
+          <h1>Applications</h1>
+          <p>Manage all admission applications.</p>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search by name or phone..." id="searchInput" oninput="filterApps()"/>
+        </div>
+        <select class="filter-select" id="statusFilter" onchange="loadApps()">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="under_review">Under Review</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+        <select class="filter-select" id="intakeFilter" onchange="loadApps()">
+          <option value="">All Intakes</option>
+          <option value="January 2026">January 2026</option>
+          <option value="July 2026">July 2026</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Ref No</th>
+                <th>Applicant</th>
+                <th>Phone</th>
+                <th>Programme</th>
+                <th>Intake</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="appsTable">
+              <tr><td colspan="8"><div class="loader"><div class="spinner"></div> Loading...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer">
+          <div id="pagination" class="pagination"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Application Modal -->
+<div class="modal-overlay" id="viewModal">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-header">
+      <span class="modal-title">Application Details</span>
+      <button class="modal-close" onclick="closeModal('viewModal')">✕</button>
+    </div>
+    <div class="modal-body" id="viewModalBody"></div>
+    <div class="modal-footer" id="viewModalFooter"></div>
+  </div>
+</div>
+
+<!-- Reject Modal -->
+<div class="modal-overlay" id="rejectModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Reject Application</span>
+      <button class="modal-close" onclick="closeModal('rejectModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Reason for Rejection</label>
+        <textarea class="form-control" id="rejectReason" placeholder="Explain why this application is being rejected..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('rejectModal')">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmReject()">Reject Application</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/admin.js"></script>
+<script>
+  ADMIN.init();
+  let currentPage = 1;
+  let selectedAppId = null;
+  let allApps = [];
+
+  function goto(page) { window.location.href = page; }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  async function loadApps(page = 1) {
+    currentPage = page;
+    const status = document.getElementById('statusFilter').value;
+    const intake = document.getElementById('intakeFilter').value;
+    let url = `/admissions?page=${page}&limit=15`;
+    if (status) url += `&status=${status}`;
+    if (intake) url += `&intake=${encodeURIComponent(intake)}`;
+
+    const tbody = document.getElementById('appsTable');
+    tbody.innerHTML = '<tr><td colspan="8"><div class="loader"><div class="spinner"></div> Loading...</div></td></tr>';
+
+    try {
+      const data = await ADMIN.get(url);
+      allApps = data.data || [];
+
+      if (!allApps.length) {
+        tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📝</div><h3>No Applications Found</h3><p>No applications match your filters.</p></div></td></tr>`;
+        return;
+      }
+
+      renderApps(allApps);
+
+      const totalPages = Math.ceil((data.meta?.total || allApps.length) / 15);
+      ADMIN.renderPagination('pagination', page, totalPages, loadApps);
+    } catch (err) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--danger)">Failed to load applications</td></tr>';
+    }
+  }
+
+  function renderApps(apps) {
+    const tbody = document.getElementById('appsTable');
+    tbody.innerHTML = apps.map(a => `
+      <tr>
+        <td><strong style="font-family:var(--font-heading);color:var(--navy)">${a.ref_no}</strong></td>
+        <td><strong>${a.full_name}</strong><br><small style="color:var(--gray-400)">${a.gender || ''} ${a.nationality || ''}</small></td>
+        <td>${a.phone}</td>
+        <td style="font-size:13px">${a.program || '—'}</td>
+        <td style="font-size:13px">${a.intake || '—'}</td>
+        <td>${ADMIN.statusBadge(a.status)}</td>
+        <td style="font-size:12px;color:var(--gray-400)">${ADMIN.formatDate(a.created_at)}</td>
+        <td>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-outline btn-sm" onclick="viewApp(${a.id})">View</button>
+            ${a.status === 'pending' || a.status === 'under_review' ? `
+              <button class="btn btn-success btn-sm" onclick="approveApp(${a.id})">✓</button>
+              <button class="btn btn-danger btn-sm" onclick="openReject(${a.id})">✗</button>
+            ` : ''}
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  function filterApps() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    if (!q) { renderApps(allApps); return; }
+    renderApps(allApps.filter(a =>
+      a.full_name?.toLowerCase().includes(q) || a.phone?.includes(q) || a.ref_no?.toLowerCase().includes(q)
+    ));
+  }
+
+  async function viewApp(id) {
+    const data = await ADMIN.get(`/admissions/${id}`);
+    if (!data.success) return;
+    const a = data.data;
+    document.getElementById('viewModalBody').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div><div class="form-label">Reference No</div><strong style="color:var(--navy)">${a.ref_no}</strong></div>
+        <div><div class="form-label">Status</div>${ADMIN.statusBadge(a.status)}</div>
+        <div><div class="form-label">Full Name</div>${a.full_name}</div>
+        <div><div class="form-label">Phone</div>${a.phone}</div>
+        <div><div class="form-label">Email</div>${a.email || '—'}</div>
+        <div><div class="form-label">Gender</div>${a.gender || '—'}</div>
+        <div><div class="form-label">Programme</div>${a.program || '—'}</div>
+        <div><div class="form-label">Intake</div>${a.intake || '—'}</div>
+        <div><div class="form-label">District</div>${a.district || '—'}</div>
+        <div><div class="form-label">Applied On</div>${ADMIN.formatDate(a.created_at)}</div>
+      </div>
+      ${a.rejection_reason ? `<div style="margin-top:16px;padding:12px;background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius)"><strong style="color:var(--danger)">Rejection Reason:</strong><p style="font-size:13px;margin-top:4px">${a.rejection_reason}</p></div>` : ''}
+      <div style="margin-top:16px">
+        <div class="form-label">Documents</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+          ${a.olevel_cert_url ? `<a href="${a.olevel_cert_url}" target="_blank" class="btn btn-outline btn-sm">📄 O-Level Cert</a>` : ''}
+          ${a.alevel_cert_url ? `<a href="${a.alevel_cert_url}" target="_blank" class="btn btn-outline btn-sm">📄 A-Level Cert</a>` : ''}
+          ${a.national_id_url ? `<a href="${a.national_id_url}" target="_blank" class="btn btn-outline btn-sm">🪪 National ID</a>` : ''}
+          ${a.passport_photo_url ? `<a href="${a.passport_photo_url}" target="_blank" class="btn btn-outline btn-sm">📸 Photo</a>` : ''}
+        </div>
+      </div>`;
+
+    document.getElementById('viewModalFooter').innerHTML = `
+      <button class="btn btn-outline" onclick="closeModal('viewModal')">Close</button>
+      ${a.status === 'pending' || a.status === 'under_review' ? `
+        <button class="btn btn-danger btn-sm" onclick="closeModal('viewModal');openReject(${a.id})">Reject</button>
+        <button class="btn btn-success" onclick="closeModal('viewModal');approveApp(${a.id})">✓ Approve</button>
+      ` : ''}`;
+
+    document.getElementById('viewModal').classList.add('open');
+  }
+
+  async function approveApp(id) {
+    if (!ADMIN.confirm('Approve this application? A student account will be created and the applicant notified by SMS.')) return;
+    const data = await ADMIN.post(`/admissions/${id}/approve`, {});
+    if (data.success) {
+      ADMIN.toast(`Application approved! Student No: ${data.data?.studentNumber}`, 'success');
+      loadApps(currentPage);
+    } else {
+      ADMIN.toast(data.message || 'Failed to approve', 'error');
+    }
+  }
+
+  function openReject(id) {
+    selectedAppId = id;
+    document.getElementById('rejectReason').value = '';
+    document.getElementById('rejectModal').classList.add('open');
+  }
+
+  async function confirmReject() {
+    const reason = document.getElementById('rejectReason').value.trim();
+    if (!reason) { ADMIN.toast('Please enter a rejection reason', 'error'); return; }
+    const data = await ADMIN.post(`/admissions/${selectedAppId}/reject`, { reason });
+    if (data.success) {
+      ADMIN.toast('Application rejected and applicant notified', 'success');
+      closeModal('rejectModal');
+      loadApps(currentPage);
+    } else {
+      ADMIN.toast(data.message || 'Failed to reject', 'error');
+    }
+  }
+
+  loadApps();
+</script>
+</body>
+</html>

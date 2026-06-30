@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Certificates — NSHS Admin</title>
+  <link rel="stylesheet" href="../css/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><span class="sidebar-logo-fallback" style="display:none">N</span></div>
+      <div><div class="sidebar-title">NSHS Admin</div><div class="sidebar-subtitle">To Serve & Care</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main</div>
+      <div class="nav-item " onclick="goto('dashboard.html')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-section-title">Admissions</div>
+      <div class="nav-item " onclick="goto('applications.html')"><span class="nav-icon">📝</span> Applications</div>
+      <div class="nav-item " onclick="goto('students.html')"><span class="nav-icon">🎓</span> Students</div>
+      <div class="nav-section-title">Academic</div>
+      <div class="nav-item " onclick="goto('programs.html')"><span class="nav-icon">📚</span> Programmes</div>
+      <div class="nav-item " onclick="goto('courses.html')"><span class="nav-icon">📖</span> Courses</div>
+      <div class="nav-item " onclick="goto('results.html')"><span class="nav-icon">📋</span> Results</div>
+      <div class="nav-item " onclick="goto('timetables.html')"><span class="nav-icon">🗓️</span> Timetables</div>
+      <div class="nav-section-title">Finance</div>
+      <div class="nav-item " onclick="goto('fees.html')"><span class="nav-icon">💰</span> Fees & Payments</div>
+      <div class="nav-section-title">Content</div>
+      <div class="nav-item " onclick="goto('news.html')"><span class="nav-icon">📰</span> News & Events</div>
+      <div class="nav-item " onclick="goto('gallery.html')"><span class="nav-icon">🖼️</span> Gallery</div>
+      <div class="nav-item active" onclick="goto('certificates.html')"><span class="nav-icon">🏅</span> Certificates</div>
+      <div class="nav-section-title">System</div>
+      <div class="nav-item " onclick="goto('staff.html')"><span class="nav-icon">👥</span> Staff Users</div>
+      <div class="nav-item " onclick="goto('notifications.html')"><span class="nav-icon">📢</span> Broadcast SMS</div>
+      <div class="nav-item " onclick="goto('reports.html')"><span class="nav-icon">📈</span> Reports</div>
+      <div class="nav-item " onclick="goto('audit.html')"><span class="nav-icon">🔒</span> Audit Logs</div>
+      <div class="nav-item " onclick="goto('contact.html')"><span class="nav-icon">✉️</span> Messages</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar user-initial">A</div>
+        <div><div class="sidebar-user-name user-name">Admin</div><div class="sidebar-user-role user-role">admin</div></div>
+        <span class="sidebar-logout" onclick="ADMIN.logout()">🚪</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <button class="topbar-menu-btn" id="sidebarToggle">☰</button>
+      <div class="topbar-title">Certificates</div>
+      <div class="topbar-right">
+        
+        <div class="topbar-user"><div class="topbar-user-avatar user-initial">A</div><span class="topbar-user-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="page-header-row">
+        <div class="page-header"><h1>Certificates</h1><p>Issue and manage graduate certificates.</p></div>
+        <button class="btn btn-gold" onclick="openIssue()">+ Issue Certificate</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">Public Certificate Verification</span></div>
+        <div class="card-body">
+          <p style="font-size:14px;color:var(--gray-500);margin-bottom:16px">Test the public verification tool that employers use to confirm certificates are genuine.</p>
+          <div style="display:flex;gap:10px;max-width:400px">
+            <input type="text" class="form-control" id="verifyTest" placeholder="Enter certificate number"/>
+            <button class="btn btn-navy" onclick="testVerify()">Verify</button>
+          </div>
+          <div id="verifyTestResult" style="margin-top:14px;display:none"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:24px">
+        <div class="card-header"><span class="card-title">Issued Certificates</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Certificate No</th><th>Student</th><th>Programme</th><th>Issue Date</th></tr></thead>
+            <tbody id="certsTable"><tr><td colspan="4"><div class="empty-state"><div class="empty-icon">🏅</div><p>Certificate list loads as you issue them</p></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="issueModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Issue Certificate</span><button class="modal-close" onclick="closeModal('issueModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Student Number *</label><input type="text" class="form-control" id="certStudentNo" placeholder="e.g. NIHS/25/0001"/></div>
+      <div class="form-group"><label class="form-label">Issue Date *</label><input type="date" class="form-control" id="certIssueDate"/></div>
+      <div style="background:rgba(77,184,232,0.08);border:1px solid rgba(77,184,232,0.2);padding:14px;border-radius:var(--radius);font-size:13px;color:var(--gray-700)">
+        ℹ️ A unique certificate number will be generated automatically. This certificate can then be verified publicly on the website.
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('issueModal')">Cancel</button><button class="btn btn-gold" onclick="issueCertificate()">Issue Certificate</button></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/admin.js"></script>
+<script>
+  ADMIN.init();
+  function goto(page) { window.location.href = page; }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  let issuedCerts = [];
+
+  function openIssue() {
+    document.getElementById('certStudentNo').value = '';
+    document.getElementById('certIssueDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('issueModal').classList.add('open');
+  }
+
+  async function issueCertificate() {
+    const studentNo = document.getElementById('certStudentNo').value.trim();
+    const issueDate = document.getElementById('certIssueDate').value;
+    if (!studentNo || !issueDate) { ADMIN.toast('Student number and issue date required', 'error'); return; }
+
+    const students = await ADMIN.get(`/students?search=${encodeURIComponent(studentNo)}&limit=1`);
+    const student = students.data?.[0];
+    if (!student) { ADMIN.toast('Student not found', 'error'); return; }
+
+    const data = await ADMIN.post('/certificates', { student_id: student.id, issue_date: issueDate });
+    if (data.success) {
+      ADMIN.toast(`Certificate issued! No: ${data.data.certNo}`, 'success');
+      issuedCerts.unshift({ cert_no: data.data.certNo, full_name: student.full_name, student_number: student.student_number, program: student.program, issue_date: issueDate });
+      renderCerts();
+      closeModal('issueModal');
+    } else {
+      ADMIN.toast(data.message || 'Failed to issue certificate', 'error');
+    }
+  }
+
+  function renderCerts() {
+    const tbody = document.getElementById('certsTable');
+    if (!issuedCerts.length) return;
+    tbody.innerHTML = issuedCerts.map(c => `
+      <tr>
+        <td><strong style="font-family:var(--font-heading);color:var(--navy)">${c.cert_no}</strong></td>
+        <td>${c.full_name}<br><small style="color:var(--gray-400)">${c.student_number}</small></td>
+        <td style="font-size:13px">${c.program || '—'}</td>
+        <td style="font-size:13px">${ADMIN.formatDate(c.issue_date)}</td>
+      </tr>`).join('');
+  }
+
+  async function testVerify() {
+    const certNo = document.getElementById('verifyTest').value.trim();
+    const result = document.getElementById('verifyTestResult');
+    if (!certNo) return;
+    result.style.display = 'block';
+    result.innerHTML = '<div class="loader" style="padding:12px"><div class="spinner"></div></div>';
+    const data = await ADMIN.get(`/certificates/verify/${certNo}`);
+    if (data.success && data.valid) {
+      result.innerHTML = `<div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);padding:14px;border-radius:var(--radius)"><strong style="color:var(--success)">✅ Valid Certificate</strong><br>${data.data.full_name} — ${data.data.program}</div>`;
+    } else {
+      result.innerHTML = `<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);padding:14px;border-radius:var(--radius)"><strong style="color:var(--danger)">❌ Not Found</strong></div>`;
+    }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>News & Events — NSHS Admin</title>
+  <link rel="stylesheet" href="../css/admin.css"/>
+  <style>
+    .news-editor { min-height: 200px; }
+    .img-preview { width: 100%; max-height: 200px; object-fit: cover; border-radius: var(--radius); margin-top: 10px; display: none; }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><span class="sidebar-logo-fallback" style="display:none">N</span></div>
+      <div><div class="sidebar-title">NSHS Admin</div><div class="sidebar-subtitle">To Serve & Care</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main</div>
+      <div class="nav-item" onclick="goto('dashboard.html')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-section-title">Admissions</div>
+      <div class="nav-item" onclick="goto('applications.html')"><span class="nav-icon">📝</span> Applications</div>
+      <div class="nav-item" onclick="goto('students.html')"><span class="nav-icon">🎓</span> Students</div>
+      <div class="nav-section-title">Academic</div>
+      <div class="nav-item" onclick="goto('programs.html')"><span class="nav-icon">📚</span> Programmes</div>
+      <div class="nav-item" onclick="goto('courses.html')"><span class="nav-icon">📖</span> Courses</div>
+      <div class="nav-item" onclick="goto('results.html')"><span class="nav-icon">📋</span> Results</div>
+      <div class="nav-item" onclick="goto('timetables.html')"><span class="nav-icon">🗓️</span> Timetables</div>
+      <div class="nav-section-title">Finance</div>
+      <div class="nav-item" onclick="goto('fees.html')"><span class="nav-icon">💰</span> Fees & Payments</div>
+      <div class="nav-section-title">Content</div>
+      <div class="nav-item active" onclick="goto('news.html')"><span class="nav-icon">📰</span> News & Events</div>
+      <div class="nav-item" onclick="goto('gallery.html')"><span class="nav-icon">🖼️</span> Gallery</div>
+      <div class="nav-item" onclick="goto('certificates.html')"><span class="nav-icon">🏅</span> Certificates</div>
+      <div class="nav-section-title">System</div>
+      <div class="nav-item" onclick="goto('staff.html')"><span class="nav-icon">👥</span> Staff Users</div>
+      <div class="nav-item" onclick="goto('notifications.html')"><span class="nav-icon">📢</span> Broadcast SMS</div>
+      <div class="nav-item" onclick="goto('reports.html')"><span class="nav-icon">📈</span> Reports</div>
+      <div class="nav-item" onclick="goto('audit.html')"><span class="nav-icon">🔒</span> Audit Logs</div>
+      <div class="nav-item" onclick="goto('contact.html')"><span class="nav-icon">✉️</span> Messages</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar user-initial">A</div>
+        <div><div class="sidebar-user-name user-name">Admin</div><div class="sidebar-user-role user-role">admin</div></div>
+        <span class="sidebar-logout" onclick="ADMIN.logout()">🚪</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <button class="topbar-menu-btn" id="sidebarToggle">☰</button>
+      <div class="topbar-title">News & Events</div>
+      <div class="topbar-right">
+        <button class="btn btn-gold" onclick="openCreate()">+ New Post</button>
+        <div class="topbar-user"><div class="topbar-user-avatar user-initial">A</div><span class="topbar-user-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="page-header-row">
+        <div class="page-header"><h1>News & Events</h1><p>Manage news articles and announcements.</p></div>
+        <button class="btn btn-gold" onclick="openCreate()">+ New Post</button>
+      </div>
+
+      <div class="filter-bar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search news..." id="searchInput" oninput="filterNews()"/>
+        </div>
+        <select class="filter-select" id="categoryFilter" onchange="loadNews()">
+          <option value="">All Categories</option>
+          <option value="Admissions">Admissions</option>
+          <option value="Achievement">Achievement</option>
+          <option value="Partnership">Partnership</option>
+          <option value="Update">Update</option>
+          <option value="Announcement">Announcement</option>
+          <option value="Event">Event</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Title</th><th>Category</th><th>Status</th><th>Views</th><th>Date</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="newsTable">
+              <tr><td colspan="6"><div class="loader"><div class="spinner"></div> Loading...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create/Edit Modal -->
+<div class="modal-overlay" id="newsModal">
+  <div class="modal" style="max-width:700px">
+    <div class="modal-header">
+      <span class="modal-title" id="newsModalTitle">New Post</span>
+      <button class="modal-close" onclick="closeModal('newsModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editId"/>
+      <div class="form-group">
+        <label class="form-label">Title *</label>
+        <input type="text" class="form-control" id="newsTitle" placeholder="News title"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-control" id="newsCategory">
+            <option value="Announcement">Announcement</option>
+            <option value="Admissions">Admissions</option>
+            <option value="Achievement">Achievement</option>
+            <option value="Partnership">Partnership</option>
+            <option value="Update">Update</option>
+            <option value="Event">Event</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-control" id="newsStatus">
+            <option value="published">Published</option>
+            <option value="draft">Draft</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Content *</label>
+        <textarea class="form-control news-editor" id="newsBody" placeholder="Write the news content here..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Image (optional)</label>
+        <input type="file" class="form-control" id="newsImage" accept="image/*" onchange="previewImage(this)"/>
+        <img id="imgPreview" class="img-preview" alt="Preview"/>
+        <div class="form-hint">Upload an image for this news post. Max 5MB.</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('newsModal')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveNews()">Save Post</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/admin.js"></script>
+<script>
+  ADMIN.init();
+  let allNews = [];
+  function goto(page) { window.location.href = page; }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  function previewImage(input) {
+    const preview = document.getElementById('imgPreview');
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  async function loadNews() {
+    const category = document.getElementById('categoryFilter').value;
+    let url = '/news?limit=50';
+    if (category) url += `&category=${encodeURIComponent(category)}`;
+    const tbody = document.getElementById('newsTable');
+    tbody.innerHTML = '<tr><td colspan="6"><div class="loader"><div class="spinner"></div> Loading...</div></td></tr>';
+    try {
+      const data = await ADMIN.get(url);
+      allNews = data.data || [];
+      renderNews(allNews);
+    } catch {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--danger)">Failed to load</td></tr>';
+    }
+  }
+
+  function renderNews(news) {
+    const tbody = document.getElementById('newsTable');
+    if (!news.length) {
+      tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📰</div><h3>No News Posts</h3><p>Create your first post.</p></div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = news.map(n => `
+      <tr>
+        <td><strong>${n.title}</strong></td>
+        <td><span class="badge badge-navy">${n.category || '—'}</span></td>
+        <td>${ADMIN.statusBadge(n.status)}</td>
+        <td style="font-size:13px">${n.views || 0} views</td>
+        <td style="font-size:12px;color:var(--gray-400)">${ADMIN.formatDate(n.created_at)}</td>
+        <td>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-outline btn-sm" onclick="editNews(${n.id},'${escStr(n.title)}','${n.category}','${n.status}',\`${escStr(n.body)}\`)">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteNews(${n.id})">Delete</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  function escStr(s) { return (s||'').replace(/'/g,"\\'").replace(/`/g,'\\`').substring(0,200); }
+
+  function filterNews() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    renderNews(!q ? allNews : allNews.filter(n => n.title?.toLowerCase().includes(q)));
+  }
+
+  function openCreate() {
+    document.getElementById('editId').value = '';
+    document.getElementById('newsTitle').value = '';
+    document.getElementById('newsBody').value = '';
+    document.getElementById('newsCategory').value = 'Announcement';
+    document.getElementById('newsStatus').value = 'published';
+    document.getElementById('imgPreview').style.display = 'none';
+    document.getElementById('newsImage').value = '';
+    document.getElementById('newsModalTitle').textContent = 'New Post';
+    document.getElementById('newsModal').classList.add('open');
+  }
+
+  function editNews(id, title, category, status, body) {
+    document.getElementById('editId').value = id;
+    document.getElementById('newsTitle').value = title;
+    document.getElementById('newsBody').value = body;
+    document.getElementById('newsCategory').value = category || 'Announcement';
+    document.getElementById('newsStatus').value = status || 'published';
+    document.getElementById('imgPreview').style.display = 'none';
+    document.getElementById('newsModalTitle').textContent = 'Edit Post';
+    document.getElementById('newsModal').classList.add('open');
+  }
+
+  async function saveNews() {
+    const id       = document.getElementById('editId').value;
+    const title    = document.getElementById('newsTitle').value.trim();
+    const body     = document.getElementById('newsBody').value.trim();
+    const category = document.getElementById('newsCategory').value;
+    const status   = document.getElementById('newsStatus').value;
+    const imageFile = document.getElementById('newsImage').files[0];
+
+    if (!title || !body) { ADMIN.toast('Title and content are required', 'error'); return; }
+
+    let data;
+    if (imageFile) {
+      const form = new FormData();
+      form.append('title', title); form.append('body', body);
+      form.append('category', category); form.append('status', status);
+      form.append('image', imageFile);
+      data = id ? await ADMIN.put(`/news/${id}`, { title, body, category, status }) : await ADMIN.postForm('/news', form);
+    } else {
+      data = id ? await ADMIN.put(`/news/${id}`, { title, body, category, status }) : await ADMIN.post('/news', { title, body, category, status });
+    }
+
+    if (data.success) {
+      ADMIN.toast(id ? 'Post updated!' : 'Post created!', 'success');
+      closeModal('newsModal');
+      loadNews();
+    } else {
+      ADMIN.toast(data.message || 'Failed to save', 'error');
+    }
+  }
+
+  async function deleteNews(id) {
+    if (!ADMIN.confirm('Delete this news post? This cannot be undone.')) return;
+    const data = await ADMIN.delete(`/news/${id}`);
+    if (data.success) { ADMIN.toast('Post deleted', 'success'); loadNews(); }
+    else ADMIN.toast(data.message || 'Failed to delete', 'error');
+  }
+
+  loadNews();
+</script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Broadcast SMS — NSHS Admin</title>
+  <link rel="stylesheet" href="../css/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><span class="sidebar-logo-fallback" style="display:none">N</span></div>
+      <div><div class="sidebar-title">NSHS Admin</div><div class="sidebar-subtitle">To Serve & Care</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main</div>
+      <div class="nav-item " onclick="goto('dashboard.html')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-section-title">Admissions</div>
+      <div class="nav-item " onclick="goto('applications.html')"><span class="nav-icon">📝</span> Applications</div>
+      <div class="nav-item " onclick="goto('students.html')"><span class="nav-icon">🎓</span> Students</div>
+      <div class="nav-section-title">Academic</div>
+      <div class="nav-item " onclick="goto('programs.html')"><span class="nav-icon">📚</span> Programmes</div>
+      <div class="nav-item " onclick="goto('courses.html')"><span class="nav-icon">📖</span> Courses</div>
+      <div class="nav-item " onclick="goto('results.html')"><span class="nav-icon">📋</span> Results</div>
+      <div class="nav-item " onclick="goto('timetables.html')"><span class="nav-icon">🗓️</span> Timetables</div>
+      <div class="nav-section-title">Finance</div>
+      <div class="nav-item " onclick="goto('fees.html')"><span class="nav-icon">💰</span> Fees & Payments</div>
+      <div class="nav-section-title">Content</div>
+      <div class="nav-item " onclick="goto('news.html')"><span class="nav-icon">📰</span> News & Events</div>
+      <div class="nav-item " onclick="goto('gallery.html')"><span class="nav-icon">🖼️</span> Gallery</div>
+      <div class="nav-item " onclick="goto('certificates.html')"><span class="nav-icon">🏅</span> Certificates</div>
+      <div class="nav-section-title">System</div>
+      <div class="nav-item " onclick="goto('staff.html')"><span class="nav-icon">👥</span> Staff Users</div>
+      <div class="nav-item active" onclick="goto('notifications.html')"><span class="nav-icon">📢</span> Broadcast SMS</div>
+      <div class="nav-item " onclick="goto('reports.html')"><span class="nav-icon">📈</span> Reports</div>
+      <div class="nav-item " onclick="goto('audit.html')"><span class="nav-icon">🔒</span> Audit Logs</div>
+      <div class="nav-item " onclick="goto('contact.html')"><span class="nav-icon">✉️</span> Messages</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar user-initial">A</div>
+        <div><div class="sidebar-user-name user-name">Admin</div><div class="sidebar-user-role user-role">admin</div></div>
+        <span class="sidebar-logout" onclick="ADMIN.logout()">🚪</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <button class="topbar-menu-btn" id="sidebarToggle">☰</button>
+      <div class="topbar-title">Broadcast SMS</div>
+      <div class="topbar-right">
+        
+        <div class="topbar-user"><div class="topbar-user-avatar user-initial">A</div><span class="topbar-user-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="page-header"><h1>Broadcast SMS</h1><p>Send SMS announcements to students.</p></div>
+
+      <div style="display:grid;grid-template-columns:1.2fr 0.8fr;gap:24px">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Compose Broadcast</span></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Send To *</label>
+              <select class="form-control" id="broadcastTarget" onchange="toggleProgramSelect()">
+                <option value="all">All Active Students</option>
+                <option value="program">Specific Programme</option>
+              </select>
+            </div>
+            <div class="form-group" id="programSelectGroup" style="display:none">
+              <label class="form-label">Programme</label>
+              <select class="form-control" id="broadcastProgram"><option value="">Select Programme</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Channel *</label>
+              <select class="form-control" id="broadcastChannel">
+                <option value="sms">SMS Only</option>
+                <option value="email">Email Only</option>
+                <option value="all">SMS + Email</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Message * <span style="color:var(--gray-400);font-weight:400" id="charCount">(0/160)</span></label>
+              <textarea class="form-control" id="broadcastMessage" placeholder="Type your message here..." maxlength="160" oninput="updateCharCount()" style="min-height:140px"></textarea>
+              <div class="form-hint">Keep SMS under 160 characters to avoid extra charges.</div>
+            </div>
+            <button class="btn btn-gold" style="width:100%;justify-content:center" onclick="sendBroadcast()">📢 Send Broadcast</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">Quick Templates</span></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+            <button class="btn btn-outline" style="justify-content:flex-start;text-align:left" onclick="useTemplate('Dear students, the school will be closed for the upcoming holiday. Classes resume on [DATE]. Thank you. - NSHS')">🏖️ Holiday Notice</button>
+            <button class="btn btn-outline" style="justify-content:flex-start;text-align:left" onclick="useTemplate('Dear students, exams begin on [DATE]. Please check the notice board for your timetable. - NSHS')">📝 Exam Notice</button>
+            <button class="btn btn-outline" style="justify-content:flex-start;text-align:left" onclick="useTemplate('Dear students, fee balances must be cleared by [DATE] to sit for exams. Pay via MTN/Airtel MoMo. - NSHS')">💰 Fee Reminder</button>
+            <button class="btn btn-outline" style="justify-content:flex-start;text-align:left" onclick="useTemplate('Dear students, there will be an important meeting on [DATE] at [TIME]. Attendance is mandatory. - NSHS')">📢 Meeting Notice</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/admin.js"></script>
+<script>
+  ADMIN.init();
+  function goto(page) { window.location.href = page; }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  async function loadPrograms() {
+    const data = await ADMIN.get('/programs');
+    if (data.success) {
+      const sel = document.getElementById('broadcastProgram');
+      data.data.forEach(p => { const o = document.createElement('option'); o.value = p.id; o.textContent = p.name; sel.appendChild(o); });
+    }
+  }
+
+  function toggleProgramSelect() {
+    document.getElementById('programSelectGroup').style.display = document.getElementById('broadcastTarget').value === 'program' ? 'block' : 'none';
+  }
+
+  function updateCharCount() {
+    const len = document.getElementById('broadcastMessage').value.length;
+    document.getElementById('charCount').textContent = `(${len}/160)`;
+  }
+
+  function useTemplate(text) {
+    document.getElementById('broadcastMessage').value = text;
+    updateCharCount();
+  }
+
+  async function sendBroadcast() {
+    const message = document.getElementById('broadcastMessage').value.trim();
+    const channel = document.getElementById('broadcastChannel').value;
+    const target  = document.getElementById('broadcastTarget').value;
+    const program_id = target === 'program' ? document.getElementById('broadcastProgram').value : null;
+
+    if (!message) { ADMIN.toast('Please type a message', 'error'); return; }
+    if (!ADMIN.confirm('Send this broadcast now? This action cannot be undone.')) return;
+
+    const data = await ADMIN.post('/notifications/broadcast', { message, channel, program_id });
+    if (data.success) {
+      ADMIN.toast(data.message, 'success');
+      document.getElementById('broadcastMessage').value = '';
+      updateCharCount();
+    } else {
+      ADMIN.toast(data.message || 'Failed to send broadcast', 'error');
+    }
+  }
+
+  loadPrograms();
+</script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — NSHS Admin</title>
+  <link rel="stylesheet" href="../css/admin.css"/>
+  <link rel="icon" href="../../images/badge.png" type="image/png"/>
+</head>
+<body>
+
+<div class="admin-layout">
+
+  <!-- Sidebar -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+        <span class="sidebar-logo-fallback" style="display:none">N</span>
+      </div>
+      <div>
+        <div class="sidebar-title">NSHS Admin</div>
+        <div class="sidebar-subtitle">To Serve & Care</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main</div>
+      <div class="nav-item active" onclick="goto('dashboard.html')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-section-title">Admissions</div>
+      <div class="nav-item" onclick="goto('applications.html')"><span class="nav-icon">📝</span> Applications <span class="nav-badge red" id="pendingCount">...</span></div>
+      <div class="nav-item" onclick="goto('students.html')"><span class="nav-icon">🎓</span> Students</div>
+      <div class="nav-section-title">Academic</div>
+      <div class="nav-item" onclick="goto('programs.html')"><span class="nav-icon">📚</span> Programmes</div>
+      <div class="nav-item" onclick="goto('courses.html')"><span class="nav-icon">📖</span> Courses</div>
+      <div class="nav-item" onclick="goto('results.html')"><span class="nav-icon">📋</span> Results</div>
+      <div class="nav-item" onclick="goto('timetables.html')"><span class="nav-icon">🗓️</span> Timetables</div>
+      <div class="nav-section-title">Finance</div>
+      <div class="nav-item" onclick="goto('fees.html')"><span class="nav-icon">💰</span> Fees & Payments</div>
+      <div class="nav-section-title">Content</div>
+      <div class="nav-item" onclick="goto('news.html')"><span class="nav-icon">📰</span> News & Events</div>
+      <div class="nav-item" onclick="goto('gallery.html')"><span class="nav-icon">🖼️</span> Gallery</div>
+      <div class="nav-item" onclick="goto('certificates.html')"><span class="nav-icon">🏅</span> Certificates</div>
+      <div class="nav-section-title">System</div>
+      <div class="nav-item" onclick="goto('staff.html')"><span class="nav-icon">👥</span> Staff Users</div>
+      <div class="nav-item" onclick="goto('notifications.html')"><span class="nav-icon">📢</span> Broadcast SMS</div>
+      <div class="nav-item" onclick="goto('reports.html')"><span class="nav-icon">📈</span> Reports</div>
+      <div class="nav-item" onclick="goto('audit.html')"><span class="nav-icon">🔒</span> Audit Logs</div>
+      <div class="nav-item" onclick="goto('contact.html')"><span class="nav-icon">✉️</span> Messages</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar user-initial">A</div>
+        <div>
+          <div class="sidebar-user-name user-name">Admin</div>
+          <div class="sidebar-user-role user-role">admin</div>
+        </div>
+        <span class="sidebar-logout" onclick="ADMIN.logout()" title="Logout">🚪</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+    <!-- Topbar -->
+    <div class="topbar">
+      <button class="topbar-menu-btn" id="sidebarToggle">☰</button>
+      <div class="topbar-title">Dashboard</div>
+      <div class="topbar-right">
+        <div class="topbar-notif">🔔<span class="notif-dot"></span></div>
+        <div class="topbar-user">
+          <div class="topbar-user-avatar user-initial">A</div>
+          <span class="topbar-user-name user-name">Admin</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="page-content">
+      <div class="page-header">
+        <h1>Dashboard</h1>
+        <p>Welcome back! Here's what's happening at NSHS today.</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-icon navy">🎓</div>
+          <div><div class="stat-num" id="statStudents">—</div><div class="stat-label">Active Students</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon gold">📝</div>
+          <div><div class="stat-num" id="statApplications">—</div><div class="stat-label">Total Applications</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red">⏳</div>
+          <div><div class="stat-num" id="statPending">—</div><div class="stat-label">Pending Applications</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">💰</div>
+          <div><div class="stat-num" id="statFees">—</div><div class="stat-label">Fees Collected</div></div>
+        </div>
+      </div>
+
+      <!-- Two column layout -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px">
+
+        <!-- Recent Applications -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Applications</span>
+            <button class="btn btn-navy btn-sm" onclick="goto('applications.html')">View All</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Programme</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="recentApps">
+                <tr><td colspan="3"><div class="loader"><div class="spinner"></div> Loading...</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Students by Programme -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Students By Programme</span>
+          </div>
+          <div class="card-body" id="programStats">
+            <div class="loader"><div class="spinner"></div> Loading...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Monthly Applications Chart -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Monthly Applications (Last 6 Months)</span>
+        </div>
+        <div class="card-body">
+          <div id="monthlyChart" style="display:flex;align-items:flex-end;gap:12px;height:180px;padding:0 8px"></div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card" style="margin-top:24px">
+        <div class="card-header"><span class="card-title">Quick Actions</span></div>
+        <div class="card-body" style="display:flex;flex-wrap:wrap;gap:12px">
+          <button class="btn btn-gold" onclick="goto('applications.html')">📝 Review Applications</button>
+          <button class="btn btn-navy" onclick="goto('results.html')">📋 Upload Results</button>
+          <button class="btn btn-sky" onclick="goto('fees.html')">💰 Record Payment</button>
+          <button class="btn btn-navy" onclick="goto('news.html')">📰 Post News</button>
+          <button class="btn btn-outline" onclick="goto('notifications.html')">📢 Send SMS Broadcast</button>
+          <button class="btn btn-outline" onclick="goto('certificates.html')">🏅 Issue Certificate</button>
+        </div>
+      </div>
+
+    </div><!-- end page-content -->
+  </div><!-- end main-content -->
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="../js/admin.js"></script>
+<script>
+  ADMIN.init();
+
+  function goto(page) { window.location.href = page; }
+
+  async function loadDashboard() {
+    try {
+      const data = await ADMIN.get('/reports/dashboard');
+      if (!data.success) return;
+
+      const d = data.data;
+
+      // Stats
+      document.getElementById('statStudents').textContent    = d.total_students || 0;
+      document.getElementById('statApplications').textContent = d.total_applications || 0;
+      document.getElementById('statPending').textContent     = d.pending_apps || 0;
+      document.getElementById('statFees').textContent        = 'UGX ' + Number(d.total_collected || 0).toLocaleString();
+      document.getElementById('pendingCount').textContent    = d.pending_apps || 0;
+
+      // Students by programme
+      const progEl = document.getElementById('programStats');
+      if (d.by_program?.length) {
+        const max = Math.max(...d.by_program.map(p => p.students));
+        progEl.innerHTML = d.by_program.map(p => `
+          <div style="margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+              <span style="font-weight:600;color:var(--navy)">${p.name}</span>
+              <span style="color:var(--gray-500)">${p.students} students</span>
+            </div>
+            <div style="background:var(--gray-100);border-radius:4px;height:8px;overflow:hidden">
+              <div style="background:var(--gold);height:100%;width:${(p.students/max*100)}%;border-radius:4px;transition:width 0.5s"></div>
+            </div>
+          </div>`).join('');
+      } else {
+        progEl.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div><p>No programme data yet</p></div>';
+      }
+
+      // Monthly chart
+      if (d.monthly_applications?.length) {
+        const chartEl = document.getElementById('monthlyChart');
+        const recent = d.monthly_applications.slice(0, 6).reverse();
+        const maxVal = Math.max(...recent.map(m => m.count));
+        chartEl.innerHTML = recent.map(m => `
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+            <span style="font-size:12px;font-weight:700;color:var(--navy)">${m.count}</span>
+            <div style="width:100%;background:var(--navy);border-radius:4px 4px 0 0;height:${Math.max(20, (m.count/maxVal)*140)}px;transition:height 0.5s"></div>
+            <span style="font-size:10px;color:var(--gray-400);white-space:nowrap">${m.month}</span>
+          </div>`).join('');
+      }
+
+    } catch (err) {
+      console.error('Dashboard error:', err);
+    }
+
+    // Load recent applications
+    try {
+      const appData = await ADMIN.get('/admissions?limit=5&page=1');
+      const tbody = document.getElementById('recentApps');
+      if (appData.success && appData.data?.length) {
+        tbody.innerHTML = appData.data.map(a => `
+          <tr>
+            <td><strong>${a.full_name}</strong><br><small style="color:var(--gray-400)">${a.phone}</small></td>
+            <td style="font-size:13px">${a.program || '—'}</td>
+            <td>${ADMIN.statusBadge(a.status)}</td>
+          </tr>`).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="3"><div class="empty-state" style="padding:24px"><div class="empty-icon">📝</div><p>No applications yet</p></div></td></tr>';
+      }
+    } catch (err) {
+      document.getElementById('recentApps').innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--gray-400);padding:20px">Failed to load</td></tr>';
+    }
+  }
+
+  loadDashboard();
+</script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Students — NSHS Admin</title>
+  <link rel="stylesheet" href="../css/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><span class="sidebar-logo-fallback" style="display:none">N</span></div>
+      <div><div class="sidebar-title">NSHS Admin</div><div class="sidebar-subtitle">To Serve & Care</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main</div>
+      <div class="nav-item" onclick="goto('dashboard.html')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-section-title">Admissions</div>
+      <div class="nav-item" onclick="goto('applications.html')"><span class="nav-icon">📝</span> Applications</div>
+      <div class="nav-item active" onclick="goto('students.html')"><span class="nav-icon">🎓</span> Students</div>
+      <div class="nav-section-title">Academic</div>
+      <div class="nav-item" onclick="goto('programs.html')"><span class="nav-icon">📚</span> Programmes</div>
+      <div class="nav-item" onclick="goto('courses.html')"><span class="nav-icon">📖</span> Courses</div>
+      <div class="nav-item" onclick="goto('results.html')"><span class="nav-icon">📋</span> Results</div>
+      <div class="nav-item" onclick="goto('timetables.html')"><span class="nav-icon">🗓️</span> Timetables</div>
+      <div class="nav-section-title">Finance</div>
+      <div class="nav-item" onclick="goto('fees.html')"><span class="nav-icon">💰</span> Fees & Payments</div>
+      <div class="nav-section-title">Content</div>
+      <div class="nav-item" onclick="goto('news.html')"><span class="nav-icon">📰</span> News & Events</div>
+      <div class="nav-item" onclick="goto('gallery.html')"><span class="nav-icon">🖼️</span> Gallery</div>
+      <div class="nav-item" onclick="goto('certificates.html')"><span class="nav-icon">🏅</span> Certificates</div>
+      <div class="nav-section-title">System</div>
+      <div class="nav-item" onclick="goto('staff.html')"><span class="nav-icon">👥</span> Staff Users</div>
+      <div class="nav-item" onclick="goto('notifications.html')"><span class="nav-icon">📢</span> Broadcast SMS</div>
+      <div class="nav-item" onclick="goto('reports.html')"><span class="nav-icon">📈</span> Reports</div>
+      <div class="nav-item" onclick="goto('audit.html')"><span class="nav-icon">🔒</span> Audit Logs</div>
+      <div class="nav-item" onclick="goto('contact.html')"><span class="nav-icon">✉️</span> Messages</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar user-initial">A</div>
+        <div><div class="sidebar-user-name user-name">Admin</div><div class="sidebar-user-role user-role">admin</div></div>
+        <span class="sidebar-logout" onclick="ADMIN.logout()">🚪</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <button class="topbar-menu-btn" id="sidebarToggle">☰</button>
+      <div class="topbar-title">Students</div>
+      <div class="topbar-right">
+        <div class="topbar-user"><div class="topbar-user-avatar user-initial">A</div><span class="topbar-user-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="page-header"><h1>Students</h1><p>Manage all enrolled students.</p></div>
+
+      <div class="filter-bar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search by name or student number..." id="searchInput" oninput="filterStudents()"/>
+        </div>
+        <select class="filter-select" id="programFilter" onchange="loadStudents()">
+          <option value="">All Programmes</option>
+        </select>
+        <select class="filter-select" id="statusFilter" onchange="loadStudents()">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="suspended">Suspended</option>
+          <option value="graduated">Graduated</option>
+          <option value="withdrawn">Withdrawn</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Student No</th><th>Name</th><th>Phone</th><th>Programme</th><th>Status</th><th>Enrolled</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="studentsTable">
+              <tr><td colspan="7"><div class="loader"><div class="spinner"></div> Loading...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer"><div id="pagination" class="pagination"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Student Modal -->
+<div class="modal-overlay" id="viewModal">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <span class="modal-title">Student Details</span>
+      <button class="modal-close" onclick="closeModal('viewModal')">✕</button>
+    </div>
+    <div class="modal-body" id="viewModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('viewModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/admin.js"></script>
+<script>
+  ADMIN.init();
+  let allStudents = [];
+  let currentPage = 1;
+  function goto(page) { window.location.href = page; }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  async function loadPrograms() {
+    const data = await ADMIN.get('/programs');
+    if (data.success) {
+      const sel = document.getElementById('programFilter');
+      data.data.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id; opt.textContent = p.name;
+        sel.appendChild(opt);
+      });
+    }
+  }
+
+  async function loadStudents(page = 1) {
+    currentPage = page;
+    const program = document.getElementById('programFilter').value;
+    const status  = document.getElementById('statusFilter').value;
+    let url = `/students?page=${page}&limit=15`;
+    if (program) url += `&program_id=${program}`;
+    if (status)  url += `&status=${status}`;
+
+    const tbody = document.getElementById('studentsTable');
+    tbody.innerHTML = '<tr><td colspan="7"><div class="loader"><div class="spinner"></div> Loading...</div></td></tr>';
+
+    try {
+      const data = await ADMIN.get(url);
+      allStudents = data.data || [];
+      if (!allStudents.length) {
+        tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🎓</div><h3>No Students Found</h3></div></td></tr>';
+        return;
+      }
+      renderStudents(allStudents);
+    } catch {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--danger)">Failed to load</td></tr>';
+    }
+  }
+
+  function renderStudents(students) {
+    document.getElementById('studentsTable').innerHTML = students.map(s => `
+      <tr>
+        <td><strong style="font-family:var(--font-heading);color:var(--navy)">${s.student_number}</strong></td>
+        <td><strong>${s.full_name}</strong></td>
+        <td>${s.phone || '—'}</td>
+        <td style="font-size:13px">${s.program || '—'}</td>
+        <td>${ADMIN.statusBadge(s.status)}</td>
+        <td style="font-size:12px;color:var(--gray-400)">${ADMIN.formatDate(s.created_at)}</td>
+        <td><button class="btn btn-outline btn-sm" onclick="viewStudent('${s.student_number}', '${s.full_name}', '${s.phone||''}', '${s.email||''}', '${s.program||''}', '${s.status}', '${ADMIN.formatDate(s.created_at)}')">View</button></td>
+      </tr>`).join('');
+  }
+
+  function filterStudents() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    if (!q) { renderStudents(allStudents); return; }
+    renderStudents(allStudents.filter(s =>
+      s.full_name?.toLowerCase().includes(q) || s.student_number?.toLowerCase().includes(q)
+    ));
+  }
+
+  function viewStudent(no, name, phone, email, program, status, enrolled) {
+    document.getElementById('viewModalBody').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div><div class="form-label">Student Number</div><strong style="color:var(--navy);font-size:18px">${no}</strong></div>
+        <div><div class="form-label">Status</div>${ADMIN.statusBadge(status)}</div>
+        <div><div class="form-label">Full Name</div>${name}</div>
+        <div><div class="form-label">Phone</div>${phone || '—'}</div>
+        <div><div class="form-label">Email</div>${email || '—'}</div>
+        <div><div class="form-label">Programme</div>${program || '—'}</div>
+        <div><div class="form-label">Enrolled</div>${enrolled}</div>
+      </div>`;
+    document.getElementById('viewModal').classList.add('open');
+  }
+
+  loadPrograms();
+  loadStudents();
+</script>
+</body>
+</html>

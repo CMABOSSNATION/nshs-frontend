@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Audit Logs — NSHS Admin</title>
+  <link rel="stylesheet" href="../css/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><span class="sidebar-logo-fallback" style="display:none">N</span></div>
+      <div><div class="sidebar-title">NSHS Admin</div><div class="sidebar-subtitle">To Serve & Care</div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main</div>
+      <div class="nav-item " onclick="goto('dashboard.html')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-section-title">Admissions</div>
+      <div class="nav-item " onclick="goto('applications.html')"><span class="nav-icon">📝</span> Applications</div>
+      <div class="nav-item " onclick="goto('students.html')"><span class="nav-icon">🎓</span> Students</div>
+      <div class="nav-section-title">Academic</div>
+      <div class="nav-item " onclick="goto('programs.html')"><span class="nav-icon">📚</span> Programmes</div>
+      <div class="nav-item " onclick="goto('courses.html')"><span class="nav-icon">📖</span> Courses</div>
+      <div class="nav-item " onclick="goto('results.html')"><span class="nav-icon">📋</span> Results</div>
+      <div class="nav-item " onclick="goto('timetables.html')"><span class="nav-icon">🗓️</span> Timetables</div>
+      <div class="nav-section-title">Finance</div>
+      <div class="nav-item " onclick="goto('fees.html')"><span class="nav-icon">💰</span> Fees & Payments</div>
+      <div class="nav-section-title">Content</div>
+      <div class="nav-item " onclick="goto('news.html')"><span class="nav-icon">📰</span> News & Events</div>
+      <div class="nav-item " onclick="goto('gallery.html')"><span class="nav-icon">🖼️</span> Gallery</div>
+      <div class="nav-item " onclick="goto('certificates.html')"><span class="nav-icon">🏅</span> Certificates</div>
+      <div class="nav-section-title">System</div>
+      <div class="nav-item " onclick="goto('staff.html')"><span class="nav-icon">👥</span> Staff Users</div>
+      <div class="nav-item " onclick="goto('notifications.html')"><span class="nav-icon">📢</span> Broadcast SMS</div>
+      <div class="nav-item " onclick="goto('reports.html')"><span class="nav-icon">📈</span> Reports</div>
+      <div class="nav-item active" onclick="goto('audit.html')"><span class="nav-icon">🔒</span> Audit Logs</div>
+      <div class="nav-item " onclick="goto('contact.html')"><span class="nav-icon">✉️</span> Messages</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar user-initial">A</div>
+        <div><div class="sidebar-user-name user-name">Admin</div><div class="sidebar-user-role user-role">admin</div></div>
+        <span class="sidebar-logout" onclick="ADMIN.logout()">🚪</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <button class="topbar-menu-btn" id="sidebarToggle">☰</button>
+      <div class="topbar-title">Audit Logs</div>
+      <div class="topbar-right">
+        
+        <div class="topbar-user"><div class="topbar-user-avatar user-initial">A</div><span class="topbar-user-name user-name">Admin</span></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="page-header"><h1>Audit Logs</h1><p>Track all admin actions for security and accountability.</p></div>
+
+      <div class="filter-bar">
+        <select class="filter-select" id="entityFilter" onchange="loadAudit()">
+          <option value="">All Entities</option>
+          <option value="applications">Applications</option>
+          <option value="programs">Programmes</option>
+          <option value="fees">Fees</option>
+          <option value="news">News</option>
+          <option value="staff">Staff</option>
+        </select>
+        <select class="filter-select" id="actionFilter" onchange="loadAudit()">
+          <option value="">All Actions</option>
+          <option value="POST">Create</option>
+          <option value="PUT">Update</option>
+          <option value="DELETE">Delete</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>User</th><th>Role</th><th>Action</th><th>Entity</th><th>Date</th></tr></thead>
+            <tbody id="auditTable"><tr><td colspan="5"><div class="loader"><div class="spinner"></div> Loading...</div></td></tr></tbody>
+          </table>
+        </div>
+        <div class="card-footer"><div id="pagination" class="pagination"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/admin.js"></script>
+<script>
+  ADMIN.init();
+  function goto(page) { window.location.href = page; }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  async function loadAudit(page = 1) {
+    const entity = document.getElementById('entityFilter').value;
+    const action = document.getElementById('actionFilter').value;
+    let url = `/audit-logs?page=${page}&limit=20`;
+    if (entity) url += `&entity=${entity}`;
+    if (action) url += `&action=${action}`;
+
+    const tbody = document.getElementById('auditTable');
+    tbody.innerHTML = '<tr><td colspan="5"><div class="loader"><div class="spinner"></div></div></td></tr>';
+    try {
+      const data = await ADMIN.get(url);
+      const rows = data.data || [];
+      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">🔒</div><h3>No Activity Logged</h3></div></td></tr>'; return; }
+      tbody.innerHTML = rows.map(a => `
+        <tr>
+          <td><strong>${a.user_name || 'System'}</strong><br><small style="color:var(--gray-400)">${a.user_email || ''}</small></td>
+          <td><span class="badge badge-navy">${a.role || '—'}</span></td>
+          <td><span class="badge ${a.action==='DELETE'?'badge-rejected':a.action==='POST'?'badge-approved':'badge-pending'}">${a.action}</span></td>
+          <td style="font-size:13px">${a.entity}</td>
+          <td style="font-size:12px;color:var(--gray-400)">${ADMIN.formatDateTime(a.created_at)}</td>
+        </tr>`).join('');
+
+      const totalPages = data.meta?.pages || 1;
+      ADMIN.renderPagination('pagination', page, totalPages, loadAudit);
+    } catch { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--danger)">Failed to load</td></tr>'; }
+  }
+
+  loadAudit();
+</script>
+</body>
+</html>
