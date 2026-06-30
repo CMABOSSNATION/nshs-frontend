@@ -1,6 +1,6 @@
 // API Configuration - Nebbi School of Health Sciences
 const API = {
-  BASE_URL: 'http://178.105.190.123:5001/api',
+  BASE_URL: 'https://nhsh.duckdns.org/api',
 
   // Auth
   LOGIN:          '/auth/login',

@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════════════════
 
 const ADMIN = {
-  BASE_URL: 'http://178.105.190.123:5001/api',
+  BASE_URL: 'https://nhsh.duckdns.org/api',
 
   // ── Auth ──
   getToken()  { return localStorage.getItem('nshs_admin_token'); },
