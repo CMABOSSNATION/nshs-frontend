@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Portal — Nebbi School of Health Sciences</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="icon" href="../images/badge.jpg" type="image/png"/>
+  <style>
+    body { background: var(--navy-dark); }
+    .portal-login-wrap {
+      min-height: 100vh; display: flex; align-items: center;
+      justify-content: center; padding: 20px;
+    }
+    .portal-login-box { width: 100%; max-width: 420px; }
+    .portal-login-header { text-align: center; margin-bottom: 32px; }
+    .portal-logo {
+      width: 90px; height: 90px; border-radius: 50%;
+      background: white; border: 3px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px; overflow: hidden;
+      box-shadow: 0 0 0 6px rgba(240,165,0,0.15);
+    }
+    .portal-logo img { width: 100%; height: 100%; object-fit: contain; }
+    .portal-school { font-family: var(--font-heading); font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: white; }
+    .portal-motto { font-size: 12px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
+    .portal-card { background: white; border-radius: 12px; padding: 36px; box-shadow: 0 24px 64px rgba(0,0,0,0.4); }
+    .portal-card h2 { font-family: var(--font-heading); font-size: 22px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--navy); margin-bottom: 8px; }
+    .portal-card p { font-size: 13px; color: var(--gray-500); margin-bottom: 28px; }
+    .error-msg { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; padding: 12px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+    .password-wrap { position: relative; }
+    .password-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 16px; }
+    .portal-footer { text-align: center; margin-top: 20px; font-size: 12px; color: rgba(255,255,255,0.4); }
+    .portal-footer a { color: var(--gold); }
+  </style>
+</head>
+<body>
+
+<div class="portal-login-wrap">
+  <div class="portal-login-box">
+    <div class="portal-login-header">
+      <div class="portal-logo">
+        <img src="../images/logo.jpg" alt="NSHS" onerror="this.style.display='none'"/>
+      </div>
+      <div class="portal-school">Nebbi School of Health Sciences</div>
+      <div class="portal-motto">To Serve & Care</div>
+    </div>
+
+    <div class="portal-card">
+      <h2>Student Portal</h2>
+      <p>Login with your student number to access results, fees, and more.</p>
+
+      <div class="error-msg" id="errorMsg"></div>
+
+      <div class="form-group">
+        <label class="form-label">Student Number</label>
+        <input type="text" class="form-control" id="studentNumber" placeholder="e.g. NSHS/26/0001" autocomplete="username"/>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="password-wrap">
+          <input type="password" class="form-control" id="password" placeholder="Default: your student number" autocomplete="current-password"/>
+          <button class="password-toggle" type="button" onclick="togglePassword()">👁️</button>
+        </div>
+      </div>
+
+      <button class="btn btn-navy btn-lg" style="width:100%;justify-content:center;margin-top:8px" onclick="login()" id="loginBtn">Sign In →</button>
+
+      <hr style="border:none;border-top:1px solid var(--cream-dark);margin:24px 0"/>
+      <div style="text-align:center">
+        <a href="forgot-password.html" style="font-size:13px;color:var(--gray-500)">Forgot password?</a>
+        <span style="color:var(--gray-300);margin:0 8px">|</span>
+        <a href="../index.html" style="font-size:13px;color:var(--gray-500)">← Back to Website</a>
+      </div>
+    </div>
+
+    <div class="portal-footer">
+      Don't have a student number yet? <a href="admissions.html">Apply Online →</a>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/api.js"></script>
+<script>
+  if (API.isLoggedIn()) window.location.href = 'student/dashboard.html';
+
+  function togglePassword() {
+    const input = document.getElementById('password');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }
+
+  async function login() {
+    const studentNumber = document.getElementById('studentNumber').value.trim();
+    const password = document.getElementById('password').value;
+    const errorMsg = document.getElementById('errorMsg');
+    const btn = document.getElementById('loginBtn');
+
+    errorMsg.style.display = 'none';
+
+    if (!studentNumber || !password) {
+      errorMsg.textContent = 'Please enter your student number and password.';
+      errorMsg.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Signing in...';
+
+    try {
+      const data = await API.post(API.STUDENT_LOGIN, { studentNumber, password });
+      if (data.success) {
+        API.setAuth(data.token, data.student);
+        window.location.href = 'student/dashboard.html';
+      } else {
+        errorMsg.textContent = data.message || 'Invalid student number or password.';
+        errorMsg.style.display = 'block';
+      }
+    } catch {
+      errorMsg.textContent = 'Connection failed. Please check your internet.';
+      errorMsg.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Sign In →';
+    }
+  }
+
+  document.addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
+</script>
+</body>
+</html>
