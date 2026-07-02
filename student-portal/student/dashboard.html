@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Dashboard — NSHS Student Portal</title>
+  <link rel="stylesheet" href="../../css/style.css"/>
+  <link rel="stylesheet" href="student.css"/>
+  <link rel="icon" href="../../images/badge.jpg" type="image/png"/>
+</head>
+<body>
+
+<div class="portal-layout">
+  <div class="portal-sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="portal-sidebar" id="sidebar">
+    <div class="portal-sidebar-header">
+      <div class="portal-sidebar-logo"><img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none'"/></div>
+      <div>
+        <div class="portal-sidebar-title">NSHS Portal</div>
+        <div class="portal-sidebar-sub">To Serve & Care</div>
+      </div>
+    </div>
+    <nav class="portal-nav">
+      <a href="dashboard.html" class="portal-nav-item active"><span>🏠</span> Dashboard</a>
+      <a href="results.html" class="portal-nav-item"><span>📋</span> My Results</a>
+      <a href="fees.html" class="portal-nav-item"><span>💰</span> Fees & Payments</a>
+      <a href="timetable.html" class="portal-nav-item"><span>🗓️</span> Timetable</a>
+      <a href="documents.html" class="portal-nav-item"><span>📄</span> My Documents</a>
+      <a href="profile.html" class="portal-nav-item"><span>👤</span> My Profile</a>
+    </nav>
+    <div class="portal-sidebar-footer">
+      <div class="portal-sidebar-user">
+        <div class="portal-user-avatar" id="userInitial">S</div>
+        <div>
+          <div class="portal-user-name" id="userName">Student</div>
+          <div class="portal-user-no" id="userNo">—</div>
+        </div>
+        <span class="portal-logout" onclick="logout()" title="Logout">🚪</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="portal-main">
+    <div class="portal-topbar">
+      <button class="portal-menu-btn" id="sidebarToggle">☰</button>
+      <div class="portal-topbar-title">My Dashboard</div>
+      <a href="../../index.html" class="btn btn-outline-green btn-sm" style="margin-left:auto">← Website</a>
+    </div>
+
+    <div class="portal-content">
+      <div class="welcome-banner">
+        <div>
+          <h1 id="welcomeName">Welcome back!</h1>
+          <p id="welcomeProgram">Loading your details...</p>
+        </div>
+        <div class="welcome-badge">🎓</div>
+      </div>
+
+      <div class="portal-stats-grid">
+        <div class="portal-stat-card">
+          <div class="portal-stat-icon gold">💰</div>
+          <div>
+            <div class="portal-stat-num" id="feeBalance">—</div>
+            <div class="portal-stat-label">Fee Balance</div>
+          </div>
+        </div>
+        <div class="portal-stat-card">
+          <div class="portal-stat-icon sky">📋</div>
+          <div>
+            <div class="portal-stat-num" id="resultsCount">—</div>
+            <div class="portal-stat-label">Results Published</div>
+          </div>
+        </div>
+        <div class="portal-stat-card">
+          <div class="portal-stat-icon navy">🗓️</div>
+          <div>
+            <div class="portal-stat-num" id="classesToday">—</div>
+            <div class="portal-stat-label">Classes Today</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="portal-grid-2">
+        <div class="portal-card">
+          <div class="portal-card-header"><span>Recent Results</span><a href="results.html">View All →</a></div>
+          <div class="portal-card-body" id="recentResults">
+            <div class="portal-loader"><div class="spinner"></div></div>
+          </div>
+        </div>
+
+        <div class="portal-card">
+          <div class="portal-card-header"><span>Fee Summary</span><a href="fees.html">View All →</a></div>
+          <div class="portal-card-body" id="feeSummaryBody">
+            <div class="portal-loader"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="portal-card" style="margin-top:20px">
+        <div class="portal-card-header"><span>Quick Actions</span></div>
+        <div class="portal-card-body" style="display:flex;flex-wrap:wrap;gap:12px">
+          <a href="fees.html" class="btn btn-gold">💰 Pay Fees</a>
+          <a href="documents.html" class="btn btn-navy">📄 Download ID Card</a>
+          <a href="documents.html" class="btn btn-navy">📜 Admission Letter</a>
+          <a href="timetable.html" class="btn btn-outline-green">🗓️ View Timetable</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../../js/api.js"></script>
+<script src="student.js"></script>
+<script>
+  PORTAL.init();
+
+  async function loadDashboard() {
+    try {
+      const me = await API.get(API.STUDENT_ME, API.getToken());
+      if (me.success) {
+        const s = me.data;
+        document.getElementById('welcomeName').textContent = `Welcome back, ${s.full_name.split(' ')[0]}!`;
+        document.getElementById('welcomeProgram').textContent = `${s.program_name || 'Your Programme'} • ${s.student_number}`;
+      }
+    } catch {}
+
+    try {
+      const fees = await API.get(API.FEES_ME, API.getToken());
+      if (fees.success) {
+        const balance = fees.data.summary.balance;
+        document.getElementById('feeBalance').textContent = 'UGX ' + Math.max(0,balance).toLocaleString();
+        document.getElementById('feeBalance').style.color = balance > 0 ? '#ef4444' : '#10b981';
+
+        const body = document.getElementById('feeSummaryBody');
+        body.innerHTML = `
+          <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--cream-dark)"><span style="font-size:13px;color:var(--gray-500)">Total Charged</span><strong>UGX ${Number(fees.data.summary.totalCharged).toLocaleString()}</strong></div>
+          <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--cream-dark)"><span style="font-size:13px;color:var(--gray-500)">Total Paid</span><strong style="color:#10b981">UGX ${Number(fees.data.summary.totalPaid).toLocaleString()}</strong></div>
+          <div style="display:flex;justify-content:space-between;padding:10px 0"><span style="font-size:13px;color:var(--gray-500)">Balance</span><strong style="color:${balance>0?'#ef4444':'#10b981'}">UGX ${Math.max(0,balance).toLocaleString()}</strong></div>`;
+      }
+    } catch {}
+
+    try {
+      const results = await API.get(API.STUDENT_RESULTS, API.getToken());
+      const tbody = document.getElementById('recentResults');
+      if (results.success && results.data?.length) {
+        document.getElementById('resultsCount').textContent = results.data.length;
+        tbody.innerHTML = results.data.slice(0,4).map(r => `
+          <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--cream-dark)">
+            <div><strong style="font-size:13px">${r.course_name}</strong><br><small style="color:var(--gray-400)">${r.semester} • ${r.academic_year}</small></div>
+            <span style="font-family:var(--font-heading);font-weight:700;color:${r.grade==='F'?'#ef4444':'#10b981'}">${r.grade}</span>
+          </div>`).join('');
+      } else {
+        document.getElementById('resultsCount').textContent = '0';
+        tbody.innerHTML = '<p style="font-size:13px;color:var(--gray-400);padding:20px 0;text-align:center">No results published yet</p>';
+      }
+    } catch {}
+
+    document.getElementById('classesToday').textContent = '—';
+  }
+
+  loadDashboard();
+</script>
+</body>
+</html>

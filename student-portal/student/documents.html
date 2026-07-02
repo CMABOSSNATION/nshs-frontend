@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Documents — NSHS Student Portal</title>
+  <link rel="stylesheet" href="../../css/style.css"/>
+  <link rel="stylesheet" href="student.css"/>
+</head>
+<body>
+<div class="portal-layout">
+  <div class="portal-sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="portal-sidebar" id="sidebar">
+    <div class="portal-sidebar-header">
+      <div class="portal-sidebar-logo"><img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none'"/></div>
+      <div><div class="portal-sidebar-title">NSHS Portal</div><div class="portal-sidebar-sub">To Serve & Care</div></div>
+    </div>
+    <nav class="portal-nav">
+      <a href="dashboard.html" class="portal-nav-item"><span>🏠</span> Dashboard</a>
+      <a href="results.html" class="portal-nav-item"><span>📋</span> My Results</a>
+      <a href="fees.html" class="portal-nav-item"><span>💰</span> Fees & Payments</a>
+      <a href="timetable.html" class="portal-nav-item"><span>🗓️</span> Timetable</a>
+      <a href="documents.html" class="portal-nav-item active"><span>📄</span> My Documents</a>
+      <a href="profile.html" class="portal-nav-item"><span>👤</span> My Profile</a>
+    </nav>
+    <div class="portal-sidebar-footer">
+      <div class="portal-sidebar-user">
+        <div class="portal-user-avatar" id="userInitial">S</div>
+        <div><div class="portal-user-name" id="userName">Student</div><div class="portal-user-no" id="userNo">—</div></div>
+        <span class="portal-logout" onclick="logout()">🚪</span>
+      </div>
+    </div>
+  </aside>
+  <div class="portal-main">
+    <div class="portal-topbar">
+      <button class="portal-menu-btn" id="sidebarToggle">☰</button>
+      <div class="portal-topbar-title">My Documents</div>
+    </div>
+    <div class="portal-content">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px">
+
+        <div class="portal-card">
+          <div class="portal-card-body" style="text-align:center;padding:32px">
+            <div style="font-size:48px;margin-bottom:16px">🪪</div>
+            <h3 style="font-family:var(--font-heading);font-size:16px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Student ID Card</h3>
+            <p style="font-size:13px;color:var(--gray-500);margin-bottom:20px">Download your official student identity card.</p>
+            <a href="#" onclick="downloadDoc('id-card')" class="btn btn-navy" style="width:100%;justify-content:center">Download ID Card</a>
+          </div>
+        </div>
+
+        <div class="portal-card">
+          <div class="portal-card-body" style="text-align:center;padding:32px">
+            <div style="font-size:48px;margin-bottom:16px">📜</div>
+            <h3 style="font-family:var(--font-heading);font-size:16px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Admission Letter</h3>
+            <p style="font-size:13px;color:var(--gray-500);margin-bottom:20px">Download your official admission letter.</p>
+            <a href="#" onclick="downloadDoc('admission-letter')" class="btn btn-navy" style="width:100%;justify-content:center">Download Letter</a>
+          </div>
+        </div>
+
+        <div class="portal-card">
+          <div class="portal-card-body" style="text-align:center;padding:32px">
+            <div style="font-size:48px;margin-bottom:16px">📋</div>
+            <h3 style="font-family:var(--font-heading);font-size:16px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Transcript Request</h3>
+            <p style="font-size:13px;color:var(--gray-500);margin-bottom:20px">Request an official academic transcript.</p>
+            <button class="btn btn-outline-green" style="width:100%;justify-content:center" onclick="showToast('Please visit the registrar office to request a transcript.','info')">Request Transcript</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="background:rgba(77,184,232,0.08);border:1px solid rgba(77,184,232,0.2);padding:16px;border-radius:10px;margin-top:24px;font-size:13px;color:var(--gray-700)">
+        ℹ️ Documents are generated as PDF files. If downloads fail, please contact the registrar's office at <strong>0768 177 177</strong>.
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast-container" id="toastContainer"></div>
+<script src="../../js/api.js"></script>
+<script src="student.js"></script>
+<script>
+  PORTAL.init();
+
+  function downloadDoc(type) {
+    const token = API.getToken();
+    const url = type === 'id-card'
+      ? `${API.BASE_URL}${API.STUDENT_ID}`
+      : `${API.BASE_URL}${API.STUDENT_ADMISSION}`;
+
+    // Open with auth header not possible directly — use fetch + blob
+    showToast('Preparing download...', 'info');
+    fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => {
+        if (!r.ok) throw new Error('Failed');
+        return r.blob();
+      })
+      .then(blob => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = type === 'id-card' ? 'nshs-id-card.pdf' : 'nshs-admission-letter.pdf';
+        a.click();
+        showToast('Download started!', 'success');
+      })
+      .catch(() => showToast('Download failed. Contact the registrar.', 'error'));
+  }
+</script>
+</body>
+</html>

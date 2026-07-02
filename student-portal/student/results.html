@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Results — NSHS Student Portal</title>
+  <link rel="stylesheet" href="../../css/style.css"/>
+  <link rel="stylesheet" href="student.css"/>
+</head>
+<body>
+<div class="portal-layout">
+  <div class="portal-sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="portal-sidebar" id="sidebar">
+    <div class="portal-sidebar-header">
+      <div class="portal-sidebar-logo"><img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none'"/></div>
+      <div><div class="portal-sidebar-title">NSHS Portal</div><div class="portal-sidebar-sub">To Serve & Care</div></div>
+    </div>
+    <nav class="portal-nav">
+      <a href="dashboard.html" class="portal-nav-item"><span>🏠</span> Dashboard</a>
+      <a href="results.html" class="portal-nav-item active"><span>📋</span> My Results</a>
+      <a href="fees.html" class="portal-nav-item"><span>💰</span> Fees & Payments</a>
+      <a href="timetable.html" class="portal-nav-item"><span>🗓️</span> Timetable</a>
+      <a href="documents.html" class="portal-nav-item"><span>📄</span> My Documents</a>
+      <a href="profile.html" class="portal-nav-item"><span>👤</span> My Profile</a>
+    </nav>
+    <div class="portal-sidebar-footer">
+      <div class="portal-sidebar-user">
+        <div class="portal-user-avatar" id="userInitial">S</div>
+        <div><div class="portal-user-name" id="userName">Student</div><div class="portal-user-no" id="userNo">—</div></div>
+        <span class="portal-logout" onclick="logout()">🚪</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="portal-main">
+    <div class="portal-topbar">
+      <button class="portal-menu-btn" id="sidebarToggle">☰</button>
+      <div class="portal-topbar-title">My Results</div>
+    </div>
+
+    <div class="portal-content">
+      <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+        <select class="form-control" id="semesterFilter" onchange="loadResults()" style="max-width:200px">
+          <option value="">All Semesters</option>
+          <option value="Semester 1">Semester 1</option>
+          <option value="Semester 2">Semester 2</option>
+        </select>
+        <select class="form-control" id="yearFilter" onchange="loadResults()" style="max-width:200px">
+          <option value="">All Years</option>
+          <option value="2025/2026">2025/2026</option>
+          <option value="2024/2025">2024/2025</option>
+        </select>
+      </div>
+
+      <div class="portal-card">
+        <div class="portal-card-header"><span>Exam Results</span></div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse">
+            <thead>
+              <tr style="background:var(--navy)">
+                <th style="padding:12px 16px;text-align:left;font-family:var(--font-heading);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:white">Course</th>
+                <th style="padding:12px 16px;text-align:left;font-family:var(--font-heading);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:white">Semester</th>
+                <th style="padding:12px 16px;text-align:left;font-family:var(--font-heading);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:white">Marks</th>
+                <th style="padding:12px 16px;text-align:left;font-family:var(--font-heading);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:white">Grade</th>
+              </tr>
+            </thead>
+            <tbody id="resultsTable">
+              <tr><td colspan="4"><div class="portal-loader"><div class="spinner"></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../../js/api.js"></script>
+<script src="student.js"></script>
+<script>
+  PORTAL.init();
+
+  async function loadResults() {
+    const semester = document.getElementById('semesterFilter').value;
+    const year = document.getElementById('yearFilter').value;
+    let url = API.STUDENT_RESULTS + '?';
+    if (semester) url += `semester=${encodeURIComponent(semester)}&`;
+    if (year) url += `academic_year=${encodeURIComponent(year)}`;
+
+    const tbody = document.getElementById('resultsTable');
+    tbody.innerHTML = '<tr><td colspan="4"><div class="portal-loader"><div class="spinner"></div></div></td></tr>';
+
+    try {
+      const data = await API.get(url, API.getToken());
+      if (!data.success || !data.data?.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--gray-400)">No results published yet.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.data.map(r => `
+        <tr style="border-bottom:1px solid var(--cream-dark)">
+          <td style="padding:12px 16px"><strong>${r.course_name}</strong><br><small style="color:var(--gray-400)">${r.course_code}</small></td>
+          <td style="padding:12px 16px;font-size:13px">${r.semester} • ${r.academic_year}</td>
+          <td style="padding:12px 16px"><strong>${r.marks}</strong>/100</td>
+          <td style="padding:12px 16px"><span style="font-family:var(--font-heading);font-weight:700;color:${r.grade==='F'?'#ef4444':'#10b981'}">${r.grade}</span></td>
+        </tr>`).join('');
+    } catch {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:30px;color:#ef4444">Failed to load results.</td></tr>';
+    }
+  }
+
+  loadResults();
+</script>
+</body>
+</html>

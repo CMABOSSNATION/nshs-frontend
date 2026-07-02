@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Profile — NSHS Student Portal</title>
+  <link rel="stylesheet" href="../../css/style.css"/>
+  <link rel="stylesheet" href="student.css"/>
+</head>
+<body>
+<div class="portal-layout">
+  <div class="portal-sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="portal-sidebar" id="sidebar">
+    <div class="portal-sidebar-header">
+      <div class="portal-sidebar-logo"><img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none'"/></div>
+      <div><div class="portal-sidebar-title">NSHS Portal</div><div class="portal-sidebar-sub">To Serve & Care</div></div>
+    </div>
+    <nav class="portal-nav">
+      <a href="dashboard.html" class="portal-nav-item"><span>🏠</span> Dashboard</a>
+      <a href="results.html" class="portal-nav-item"><span>📋</span> My Results</a>
+      <a href="fees.html" class="portal-nav-item"><span>💰</span> Fees & Payments</a>
+      <a href="timetable.html" class="portal-nav-item"><span>🗓️</span> Timetable</a>
+      <a href="documents.html" class="portal-nav-item"><span>📄</span> My Documents</a>
+      <a href="profile.html" class="portal-nav-item active"><span>👤</span> My Profile</a>
+    </nav>
+    <div class="portal-sidebar-footer">
+      <div class="portal-sidebar-user">
+        <div class="portal-user-avatar" id="userInitial">S</div>
+        <div><div class="portal-user-name" id="userName">Student</div><div class="portal-user-no" id="userNo">—</div></div>
+        <span class="portal-logout" onclick="logout()">🚪</span>
+      </div>
+    </div>
+  </aside>
+  <div class="portal-main">
+    <div class="portal-topbar">
+      <button class="portal-menu-btn" id="sidebarToggle">☰</button>
+      <div class="portal-topbar-title">My Profile</div>
+    </div>
+    <div class="portal-content">
+      <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:24px;align-items:start">
+
+        <!-- Profile Card -->
+        <div class="portal-card">
+          <div class="portal-card-body" style="text-align:center;padding:32px">
+            <div style="width:80px;height:80px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-family:var(--font-heading);font-size:32px;font-weight:700;color:var(--gold)" id="profileInitial">S</div>
+            <h2 style="font-family:var(--font-heading);font-size:18px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:1px" id="profileName">—</h2>
+            <p style="font-size:13px;color:var(--gray-400);margin-top:4px" id="profileNo">—</p>
+            <div style="margin-top:16px;padding:12px;background:var(--cream);border-radius:8px">
+              <div style="font-family:var(--font-heading);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray-400)">Programme</div>
+              <div style="font-size:14px;font-weight:600;color:var(--navy);margin-top:4px" id="profileProgram">—</div>
+            </div>
+            <div style="margin-top:10px;padding:12px;background:var(--cream);border-radius:8px">
+              <div style="font-family:var(--font-heading);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray-400)">Status</div>
+              <div style="font-size:14px;font-weight:600;color:#10b981;margin-top:4px" id="profileStatus">Active</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <!-- Details -->
+          <div class="portal-card">
+            <div class="portal-card-header"><span>Personal Details</span></div>
+            <div class="portal-card-body" id="profileDetails">
+              <div class="portal-loader"><div class="spinner"></div></div>
+            </div>
+          </div>
+
+          <!-- Change Password -->
+          <div class="portal-card">
+            <div class="portal-card-header"><span>Change Password</span></div>
+            <div class="portal-card-body">
+              <div class="form-group">
+                <label class="form-label">Current Password</label>
+                <input type="password" class="form-control" id="oldPass" placeholder="Your current password"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">New Password</label>
+                <input type="password" class="form-control" id="newPass" placeholder="Min 8 characters"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Confirm New Password</label>
+                <input type="password" class="form-control" id="confirmPass" placeholder="Repeat new password"/>
+              </div>
+              <button class="btn btn-navy" onclick="changePassword()">Update Password</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast-container" id="toastContainer"></div>
+<script src="../../js/api.js"></script>
+<script src="student.js"></script>
+<script>
+  PORTAL.init();
+
+  async function loadProfile() {
+    try {
+      const data = await API.get(API.STUDENT_ME, API.getToken());
+      if (!data.success) return;
+      const s = data.data;
+      const initial = (s.full_name||'S')[0].toUpperCase();
+      document.getElementById('profileInitial').textContent = initial;
+      document.getElementById('profileName').textContent = s.full_name;
+      document.getElementById('profileNo').textContent = s.student_number;
+      document.getElementById('profileProgram').textContent = s.program_name || '—';
+      document.getElementById('profileStatus').textContent = s.status || 'active';
+
+      document.getElementById('profileDetails').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          ${row('Student Number', s.student_number)}
+          ${row('Full Name', s.full_name)}
+          ${row('Phone', s.phone || '—')}
+          ${row('Email', s.email || '—')}
+          ${row('Gender', s.gender || '—')}
+          ${row('Date of Birth', s.dob ? new Date(s.dob).toLocaleDateString('en-UG') : '—')}
+        </div>`;
+    } catch {}
+  }
+
+  function row(label, value) {
+    return `<div><div style="font-size:11px;font-family:var(--font-heading);letter-spacing:1px;text-transform:uppercase;color:var(--gray-400);margin-bottom:3px">${label}</div><div style="font-size:14px;font-weight:500;color:var(--gray-900)">${value}</div></div>`;
+  }
+
+  async function changePassword() {
+    const oldPass  = document.getElementById('oldPass').value;
+    const newPass  = document.getElementById('newPass').value;
+    const confirm  = document.getElementById('confirmPass').value;
+    if (!oldPass || !newPass) { showToast('All fields are required', 'error'); return; }
+    if (newPass.length < 8) { showToast('New password must be at least 8 characters', 'error'); return; }
+    if (newPass !== confirm) { showToast('Passwords do not match', 'error'); return; }
+
+    try {
+      const data = await API.put('/auth/student/change-password', { oldPassword: oldPass, newPassword: newPass }, API.getToken());
+      // API.put fix for student portal
+      const res = await fetch(API.BASE_URL + '/auth/student/change-password', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API.getToken()}` },
+        body: JSON.stringify({ oldPassword: oldPass, newPassword: newPass })
+      });
+      const result = await res.json();
+      if (result.success) {
+        showToast('Password changed successfully!', 'success');
+        document.getElementById('oldPass').value = '';
+        document.getElementById('newPass').value = '';
+        document.getElementById('confirmPass').value = '';
+      } else {
+        showToast(result.message || 'Failed to change password', 'error');
+      }
+    } catch { showToast('Connection failed. Please try again.', 'error'); }
+  }
+
+  loadProfile();
+</script>
+</body>
+</html>

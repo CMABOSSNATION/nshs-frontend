@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fees & Payments — NSHS Student Portal</title>
+  <link rel="stylesheet" href="../../css/style.css"/>
+  <link rel="stylesheet" href="student.css"/>
+</head>
+<body>
+<div class="portal-layout">
+  <div class="portal-sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="portal-sidebar" id="sidebar">
+    <div class="portal-sidebar-header">
+      <div class="portal-sidebar-logo"><img src="../../images/logo.jpg" alt="NSHS" onerror="this.style.display='none'"/></div>
+      <div><div class="portal-sidebar-title">NSHS Portal</div><div class="portal-sidebar-sub">To Serve & Care</div></div>
+    </div>
+    <nav class="portal-nav">
+      <a href="dashboard.html" class="portal-nav-item"><span>🏠</span> Dashboard</a>
+      <a href="results.html" class="portal-nav-item"><span>📋</span> My Results</a>
+      <a href="fees.html" class="portal-nav-item active"><span>💰</span> Fees & Payments</a>
+      <a href="timetable.html" class="portal-nav-item"><span>🗓️</span> Timetable</a>
+      <a href="documents.html" class="portal-nav-item"><span>📄</span> My Documents</a>
+      <a href="profile.html" class="portal-nav-item"><span>👤</span> My Profile</a>
+    </nav>
+    <div class="portal-sidebar-footer">
+      <div class="portal-sidebar-user">
+        <div class="portal-user-avatar" id="userInitial">S</div>
+        <div><div class="portal-user-name" id="userName">Student</div><div class="portal-user-no" id="userNo">—</div></div>
+        <span class="portal-logout" onclick="logout()">🚪</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="portal-main">
+    <div class="portal-topbar">
+      <button class="portal-menu-btn" id="sidebarToggle">☰</button>
+      <div class="portal-topbar-title">Fees & Payments</div>
+    </div>
+
+    <div class="portal-content">
+
+      <div class="welcome-banner" style="margin-bottom:20px">
+        <div>
+          <h1 style="font-size:18px">Current Balance</h1>
+          <p id="balanceDisplay" style="font-size:24px;color:var(--gold);font-weight:700;margin-top:6px">—</p>
+        </div>
+        <div class="welcome-badge">💰</div>
+      </div>
+
+      <div class="portal-grid-2">
+        <!-- Pay Now -->
+        <div class="portal-card">
+          <div class="portal-card-header"><span>Make a Payment</span></div>
+          <div class="portal-card-body">
+            <div class="form-group">
+              <label class="form-label">Amount (UGX) *</label>
+              <input type="number" class="form-control" id="payAmount" placeholder="e.g. 500000"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number *</label>
+              <input type="tel" class="form-control" id="payPhone" placeholder="0768 177 177"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Semester</label>
+              <select class="form-control" id="paySemester">
+                <option value="Semester 1">Semester 1</option>
+                <option value="Semester 2">Semester 2</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:8px">
+              <button class="btn btn-gold" style="flex:1;justify-content:center" onclick="payWith('mtn')">📱 MTN MoMo</button>
+              <button class="btn btn-navy" style="flex:1;justify-content:center" onclick="payWith('airtel')">📱 Airtel Money</button>
+            </div>
+            <div id="paymentStatus" style="margin-top:16px;display:none"></div>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="portal-card">
+          <div class="portal-card-header"><span>Summary</span></div>
+          <div class="portal-card-body" id="feeSummary">
+            <div class="portal-loader"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment History -->
+      <div class="portal-card" style="margin-top:20px">
+        <div class="portal-card-header"><span>Payment History</span></div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse">
+            <thead>
+              <tr style="background:var(--navy)">
+                <th style="padding:12px 16px;text-align:left;font-family:var(--font-heading);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:white">Receipt</th>
+                <th style="padding:12px 16px;text-align:left;font-family:var(--font-heading);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:white">Amount</th>
+                <th style="padding:12px 16px;text-align:left;font-family:var(--font-heading);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:white">Method</th>
+                <th style="padding:12px 16px;text-align:left;font-family:var(--font-heading);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:white">Date</th>
+                <th style="padding:12px 16px;text-align:left;font-family:var(--font-heading);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:white">Receipt</th>
+              </tr>
+            </thead>
+            <tbody id="paymentsTable">
+              <tr><td colspan="5"><div class="portal-loader"><div class="spinner"></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../../js/api.js"></script>
+<script src="student.js"></script>
+<script>
+  PORTAL.init();
+  let pollInterval = null;
+
+  async function loadFees() {
+    try {
+      const data = await API.get(API.FEES_ME, API.getToken());
+      if (data.success) {
+        const s = data.data.summary;
+        document.getElementById('balanceDisplay').textContent = 'UGX ' + Math.max(0,s.balance).toLocaleString();
+
+        document.getElementById('feeSummary').innerHTML = `
+          <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--cream-dark)"><span style="font-size:13px;color:var(--gray-500)">Total Charged</span><strong>UGX ${Number(s.totalCharged).toLocaleString()}</strong></div>
+          <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--cream-dark)"><span style="font-size:13px;color:var(--gray-500)">Total Paid</span><strong style="color:#10b981">UGX ${Number(s.totalPaid).toLocaleString()}</strong></div>
+          <div style="display:flex;justify-content:space-between;padding:10px 0"><span style="font-size:13px;color:var(--gray-500)">Status</span><strong style="color:${s.status==='cleared'?'#10b981':'#ef4444'}">${s.status==='cleared'?'✅ Cleared':'⚠️ Outstanding'}</strong></div>`;
+
+        const tbody = document.getElementById('paymentsTable');
+        if (data.data.payments?.length) {
+          tbody.innerHTML = data.data.payments.map(p => `
+            <tr style="border-bottom:1px solid var(--cream-dark)">
+              <td style="padding:12px 16px;font-family:var(--font-heading);color:var(--navy)">${p.receipt_no || '—'}</td>
+              <td style="padding:12px 16px"><strong>UGX ${Number(p.amount).toLocaleString()}</strong></td>
+              <td style="padding:12px 16px;font-size:13px">${p.method?.replace(/_/g,' ')}</td>
+              <td style="padding:12px 16px;font-size:12px;color:var(--gray-400)">${new Date(p.created_at).toLocaleDateString('en-UG')}</td>
+              <td style="padding:12px 16px">${p.receipt_no ? `<a href="${API.BASE_URL}/fees/receipt/${p.receipt_no}" target="_blank" class="btn btn-outline-green btn-sm">Download</a>` : '—'}</td>
+            </tr>`).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--gray-400)">No payments yet</td></tr>';
+        }
+      }
+    } catch {}
+  }
+
+  async function payWith(provider) {
+    const amount = document.getElementById('payAmount').value;
+    const phone  = document.getElementById('payPhone').value.trim();
+    const semester = document.getElementById('paySemester').value;
+    const statusEl = document.getElementById('paymentStatus');
+
+    if (!amount || !phone) { showToast('Please enter amount and phone number', 'error'); return; }
+
+    statusEl.style.display = 'block';
+    statusEl.innerHTML = `<div class="portal-loader"><div class="spinner"></div></div><p style="text-align:center;font-size:13px;color:var(--gray-500)">Sending payment request...</p>`;
+
+    const endpoint = provider === 'mtn' ? API.FEES_PAY_MTN : API.FEES_PAY_AIRTEL;
+    try {
+      const data = await API.post(endpoint, { amount: Number(amount), phone, description: `Tuition - ${semester}`, semester, academic_year: '2025/2026' }, API.getToken());
+      if (data.success) {
+        statusEl.innerHTML = `<div style="background:rgba(77,184,232,0.1);border:1px solid rgba(77,184,232,0.3);padding:14px;border-radius:8px;font-size:13px">📱 Check your phone and approve the payment prompt. Waiting for confirmation...</div>`;
+        pollPaymentStatus(data.data.referenceId);
+      } else {
+        statusEl.innerHTML = `<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);padding:14px;border-radius:8px;font-size:13px;color:#ef4444">${data.message || 'Payment failed to initiate'}</div>`;
+      }
+    } catch {
+      statusEl.innerHTML = `<div style="background:rgba(239,68,68,0.1);padding:14px;border-radius:8px;font-size:13px;color:#ef4444">Connection failed. Please try again.</div>`;
+    }
+  }
+
+  function pollPaymentStatus(refId) {
+    if (pollInterval) clearInterval(pollInterval);
+    let attempts = 0;
+    pollInterval = setInterval(async () => {
+      attempts++;
+      if (attempts > 20) { clearInterval(pollInterval); return; }
+      try {
+        const data = await API.get(`${API.FEES_STATUS}/${refId}`, API.getToken());
+        if (data.status === 'SUCCESSFUL') {
+          clearInterval(pollInterval);
+          document.getElementById('paymentStatus').innerHTML = `<div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);padding:14px;border-radius:8px;font-size:13px;color:#065f46">✅ Payment successful! Receipt: <strong>${data.receiptNo}</strong></div>`;
+          showToast('Payment confirmed!', 'success');
+          loadFees();
+        }
+      } catch {}
+    }, 5000);
+  }
+
+  loadFees();
+</script>
+</body>
+</html>
